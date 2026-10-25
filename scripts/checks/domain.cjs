@@ -28,4 +28,11 @@ for (const ride of rides) {
   const route = findRoute(ride.slug, 'gearworks-eatery');
   if (!route || route.meters < 0 || !route.paths.length) throw Error('Disconnected route: ' + ride.slug);
 }
-console.log(`Passed ${cases} schedule cases and ${rides.length} map routes.`);
+const graph = JSON.parse(fs.readFileSync(path.join(root, 'lib/park-routes.json'), 'utf8'));
+const facilities = graph.places.filter(p => p.kind === 'PRAYER_ROOM' || p.kind === 'RESTROOM');
+for (const facility of facilities) {
+  const outbound = findRoute('iron-rattler', facility.sourcePlaceId);
+  const inbound = findRoute(facility.sourcePlaceId, 'iron-rattler');
+  if (!outbound || !inbound || outbound.meters !== inbound.meters) throw Error('Facility route missing or asymmetric: ' + facility.sourcePlaceId);
+}
+console.log(`Passed ${cases} schedule cases, ${rides.length} ride routes, and ${facilities.length} facility routes in both directions.`);

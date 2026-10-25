@@ -1,25 +1,72 @@
 'use client';
-import { useMemo,useState,useRef } from 'react';
-import { MapPin,Plus,Minus,LocateFixed,Route,Navigation,UtensilsCrossed,Maximize,MousePointer2,ArrowLeft } from 'lucide-react';
+import { useMemo, useState, useRef } from 'react';
+import { MapPin, Plus, Minus, LocateFixed, Route, Navigation, UtensilsCrossed, Maximize, MousePointer2, ArrowLeft, MoonStar, Toilet, Footprints } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { parkGraph,rides,findRoute } from '@/lib/sikka-data';
+import { parkGraph, rides, findRoute } from '@/lib/sikka-data';
 import { toast } from 'sonner';
-export function ParkMap({compact=false,onRide,onPlan}:{compact?:boolean;onRide:(s:string)=>void;onPlan?:()=>void}){
-const [selected,setSelected]=useState('iron-rattler'),[layer,setLayer]=useState('rides'),[zoom,setZoom]=useState(1),[pan,setPan]=useState({x:0,y:0}),[routing,setRouting]=useState(false),[imageError,setImageError]=useState(false);const drag=useRef<{x:number;y:number;px:number;py:number}|null>(null);
-const ride=rides.find(r=>r.slug===selected)!;const route=useMemo(()=>routing?findRoute(selected,'gearworks-eatery'):null,[routing,selected]);
-const markers=layer==='places'?parkGraph.places.filter(p=>p.kind==='RESTAURANT'):parkGraph.rides;
-function locate(){if(!navigator.geolocation){toast.error('جهازك ما يدعم تحديد الموقع');return;}navigator.geolocation.getCurrentPosition(()=>toast.info('تم تحديد موقعك. معايرة الموقع على صورة المنتزه تحتاج ربط الخدمة الفعلية؛ لم نضع موقعًا وهميًا.'),()=>toast.info('ما قدرنا نحدد موقعك. تقدر تستكشف الخريطة يدويًا.'),{timeout:10000});}
-return <div className={`park-map ${compact?'compact-map':''}`}>
-<div className="map-toolbar"><div className="map-layers"><button className={layer==='rides'?'active':''} onClick={()=>setLayer('rides')}><MapPin size={15}/>الألعاب</button><button className={layer==='places'?'active':''} onClick={()=>setLayer('places')}><UtensilsCrossed size={15}/>المطاعم</button></div><span className="map-tip"><MousePointer2 size={14}/>اسحب لاستكشاف المنتزه</span></div>
-<div className="map-viewport" onPointerDown={e=>{if((e.target as Element).closest('button'))return;drag.current={x:e.clientX,y:e.clientY,px:pan.x,py:pan.y};e.currentTarget.setPointerCapture(e.pointerId);}} onPointerMove={e=>{if(drag.current)setPan({x:drag.current.px+e.clientX-drag.current.x,y:drag.current.py+e.clientY-drag.current.y});}} onPointerUp={()=>{drag.current=null;}} onPointerCancel={()=>{drag.current=null;}}>
-<div className="map-surface" style={{transform:`translate(${pan.x}px,${pan.y}px) scale(${zoom})`}}>
-{!imageError&&<img className="real-park-map" src="/api/media/map" alt="الخريطة المصوّرة للملاهي من مستودع سكة" onError={()=>setImageError(true)} draggable={false}/>}
-<svg preserveAspectRatio="none" viewBox="0 0 6500 4035" className={`map-routes ${imageError?'fallback-routes':''}`} aria-label="شبكة مسارات المشي من بيانات المشروع"><rect width="6500" height="4035" fill={imageError?'#e3eed9':'transparent'}/>{parkGraph.edges.map(e=><path key={e.id} d={'M'+e.points.map(p=>p.join(',')).join('L')} fill="none" stroke={imageError?'#fff':'#0B2E8B'} strokeOpacity={imageError?1:.22} strokeWidth={imageError?28:12} strokeLinecap="round"/>)}{route?.paths.map((p,i)=><path key={i} className="route-highlight" d={'M'+p.map(v=>v.join(',')).join('L')} fill="none" stroke="#ed1d2d" strokeWidth="38" strokeLinecap="round"/>)}</svg>
-{markers.map(m=>{const n=parkGraph.nodes.find(n=>n.id===m.nodeId);if(!n)return null;const slug='sourceRideId'in m?m.sourceRideId:'';return <button key={m.name} className={`map-pin ${slug===selected?'selected':''} ${layer==='places'?'food-pin':''}`} style={{left:`${n.x/6500*100}%`,top:`${n.y/4035*100}%`}} title={m.name} aria-label={m.name} onClick={()=>{if(slug){setSelected(slug);setRouting(false);}else toast.info(m.name);}}>{layer==='places'?<UtensilsCrossed size={13}/>:<MapPin size={14}/>}<span>{m.name}</span></button>;})}
-</div>
-<div className="map-controls"><button aria-label="تكبير الخريطة" onClick={()=>setZoom(z=>Math.min(3,z+.25))}><Plus size={19}/></button><button aria-label="تصغير الخريطة" onClick={()=>setZoom(z=>Math.max(.75,z-.25))}><Minus size={19}/></button><button aria-label="إعادة ضبط الخريطة" onClick={()=>{setZoom(1);setPan({x:0,y:0});}}><Maximize size={17}/></button><button aria-label="تحديد موقعي" onClick={locate}><LocateFixed size={18}/></button></div>
-<div className="map-legend"><i/>مسارات المشروع <span>مداخل الألعاب غير مؤكدة</span></div>
-</div>
-<div className="map-selection"><span className="pin-square"><Navigation size={22}/></span><div><small>{routing?'وجهتك: Gearworks Eatery':ride.landName}</small><h3 dir="ltr">{ride.name}</h3>{route&&<small>المسار التقريبي: {route.meters} م · {route.minutes} د مشي</small>}</div><div className="map-selection-actions"><Button variant="outline" onClick={()=>setRouting(r=>!r)}><Route size={15}/>{routing?'إخفاء المسار':'مسار للبريك'}</Button><Button onClick={()=>onRide(selected)}>شوف اللعبة<ArrowLeft size={15}/></Button></div></div>
-</div>;
+
+type Layer = 'rides' | 'places' | 'prayer' | 'restrooms';
+const areaNames: Record<string, string> = { 'city-of-thrills': 'مدينة التشويق', 'steam-town': 'ستيم تاون', 'twilight-gardens': 'حدائق الغسق', 'valley-of-fortune': 'وادي الكنوز', 'discovery-springs': 'ينابيع الاكتشاف', 'grand-exposition': 'المعرض الكبير', citadel: 'القلعة' };
+function facilityName(place: typeof parkGraph.places[number]) {
+  if (place.kind !== 'RESTROOM' && place.kind !== 'PRAYER_ROOM') return place.name;
+  const area = Object.keys(areaNames).find(a => place.sourcePlaceId.startsWith(a));
+  const number = place.sourcePlaceId.match(/\d+$/)?.[0] || '';
+  return `${place.kind === 'PRAYER_ROOM' ? 'مصلى' : 'دورات مياه'} · ${area ? areaNames[area] : ''} ${number}`;
+}
+const mapItems = [
+  ...parkGraph.rides.map(r => ({ id: r.sourceRideId, name: r.name.replace(' (temporarily closed)', ''), nodeId: r.nodeId, kind: 'RIDE' })),
+  ...parkGraph.places.filter(p => ['RESTAURANT', 'PRAYER_ROOM', 'RESTROOM'].includes(p.kind)).map(p => ({ id: p.sourcePlaceId, name: facilityName(p), nodeId: p.nodeId, kind: p.kind })),
+];
+const layerKinds: Record<Layer, string> = { rides: 'RIDE', places: 'RESTAURANT', prayer: 'PRAYER_ROOM', restrooms: 'RESTROOM' };
+const layers = [{ id: 'rides' as Layer, name: 'الألعاب', icon: MapPin }, { id: 'places' as Layer, name: 'المطاعم', icon: UtensilsCrossed }, { id: 'prayer' as Layer, name: 'المصليات', icon: MoonStar }, { id: 'restrooms' as Layer, name: 'دورات المياه', icon: Toilet }];
+export function ParkMap({ compact = false, onRide }: { compact?: boolean; onRide: (s: string) => void; onPlan?: () => void }) {
+  const [selected, setSelected] = useState('iron-rattler');
+  const [layer, setLayer] = useState<Layer>('rides');
+  const [zoom, setZoom] = useState(1), [pan, setPan] = useState({ x: 0, y: 0 });
+  const [routing, setRouting] = useState(false), [showPlanner, setShowPlanner] = useState(!compact), [imageError, setImageError] = useState(false);
+  const [origin, setOrigin] = useState('iron-rattler'), [destination, setDestination] = useState('gearworks-eatery');
+  const drag = useRef<{ x: number; y: number; px: number; py: number } | null>(null);
+  const selectedItem = mapItems.find(m => m.id === selected)!;
+  const selectedRide = rides.find(r => r.slug === selected);
+  const route = useMemo(() => routing ? findRoute(origin, destination) : null, [routing, origin, destination]);
+  const markers = mapItems.filter(m => m.kind === layerKinds[layer]);
+  const startItem = mapItems.find(m => m.id === origin)!;
+  const endItem = mapItems.find(m => m.id === destination)!;
+  const startNode = parkGraph.nodes.find(n => n.id === startItem.nodeId)!;
+  const endNode = parkGraph.nodes.find(n => n.id === endItem.nodeId)!;
+  const SelectedIcon = selectedItem.kind === 'PRAYER_ROOM' ? MoonStar : selectedItem.kind === 'RESTROOM' ? Toilet : selectedItem.kind === 'RESTAURANT' ? UtensilsCrossed : Navigation;
+  function selectLayer(next: Layer) {
+    setLayer(next);
+    const first = mapItems.find(m => m.kind === layerKinds[next]);
+    if (first) { setSelected(first.id); setDestination(first.id); }
+    setRouting(false);
+  }
+  function drawRoute() {
+    const found = findRoute(origin, destination);
+    if (!found) { toast.info('ما لقينا مسار متصل بين النقطتين في بيانات المشروع.'); setRouting(false); return; }
+    setRouting(true);
+  }
+  function locate() {
+    if (!navigator.geolocation) { toast.error('جهازك ما يدعم تحديد الموقع'); return; }
+    navigator.geolocation.getCurrentPosition(() => toast.info('تم تحديد موقعك. معايرة الموقع على صورة المنتزه تحتاج ربط الخدمة الفعلية؛ لم نضع موقعًا وهميًا.'), () => toast.info('ما قدرنا نحدد موقعك. تقدر تستكشف الخريطة يدويًا.'), { timeout: 10000 });
+  }
+  function destinationOptions() {
+    return layers.map(l => <optgroup key={l.id} label={l.name}>{mapItems.filter(m => m.kind === layerKinds[l.id]).map(m => <option key={m.id} value={m.id}>{m.name}</option>)}</optgroup>);
+  }
+  return <div className={`park-map ${compact ? 'compact-map' : ''}`}>
+    <div className="map-toolbar"><div className="map-layers">{layers.map(l => <button key={l.id} aria-pressed={layer === l.id} className={layer === l.id ? 'active' : ''} onClick={() => selectLayer(l.id)}><l.icon size={15}/>{l.name}<small>{mapItems.filter(m => m.kind === layerKinds[l.id]).length}</small></button>)}</div><button className="map-plan-toggle" aria-expanded={showPlanner} onClick={() => setShowPlanner(s => !s)}><Footprints size={15}/>{showPlanner ? 'إخفاء مخطط المشي' : 'مسار مشي'}</button></div>
+    {showPlanner && <div className="map-route-planner"><label><span>من وين نبدأ؟</span><select aria-label="بداية مسار المشي" value={origin} onChange={e => { setOrigin(e.target.value); setRouting(false); }}>{destinationOptions()}</select></label><Route size={19}/><label><span>وين نروح؟</span><select aria-label="وجهة مسار المشي" value={destination} onChange={e => { setDestination(e.target.value); setRouting(false); }}>{destinationOptions()}</select></label><Button disabled={origin === destination} onClick={drawRoute}>ارسم مسار المشي<Footprints size={16}/></Button></div>}
+    <div className="map-viewport" onPointerDown={e => { if ((e.target as Element).closest('button')) return; drag.current = { x: e.clientX, y: e.clientY, px: pan.x, py: pan.y }; e.currentTarget.setPointerCapture(e.pointerId); }} onPointerMove={e => { if (drag.current) setPan({ x: drag.current.px + e.clientX - drag.current.x, y: drag.current.py + e.clientY - drag.current.y }); }} onPointerUp={() => { drag.current = null; }} onPointerCancel={() => { drag.current = null; }}>
+      <div className="map-surface" style={{ transform: `translate(${pan.x}px,${pan.y}px) scale(${zoom})` }}>
+        {!imageError && <img className="real-park-map" src="/api/media/map" alt="الخريطة المصوّرة للملاهي من مستودع سكة" onError={() => setImageError(true)} draggable={false}/>}
+        <svg preserveAspectRatio="none" viewBox="0 0 6500 4035" className={`map-routes ${imageError ? 'fallback-routes' : ''}`} aria-label="شبكة مسارات المشي من بيانات المشروع"><rect width="6500" height="4035" fill={imageError ? '#e3eed9' : 'transparent'}/>{parkGraph.edges.map(e => <path key={e.id} d={'M' + e.points.map(p => p.join(',')).join('L')} fill="none" stroke={imageError ? '#fff' : '#0B2E8B'} strokeOpacity={imageError ? 1 : .22} strokeWidth={imageError ? 28 : 12} strokeLinecap="round"/>)}{route?.paths.map((p, i) => <path key={i} className="route-highlight" d={'M' + p.map(v => v.join(',')).join('L')} fill="none" stroke="#ed1d2d" strokeWidth="38" strokeLinecap="round"/>)}</svg>
+        {markers.map(m => { const n = parkGraph.nodes.find(n => n.id === m.nodeId); if (!n) return null; const Icon = m.kind === 'PRAYER_ROOM' ? MoonStar : m.kind === 'RESTROOM' ? Toilet : m.kind === 'RESTAURANT' ? UtensilsCrossed : MapPin; return <button key={m.id} className={`map-pin ${m.id === selected ? 'selected' : ''} ${m.kind === 'PRAYER_ROOM' ? 'prayer-pin' : m.kind === 'RESTROOM' ? 'restroom-pin' : m.kind === 'RESTAURANT' ? 'food-pin' : ''}`} style={{ left: `${n.x / 6500 * 100}%`, top: `${n.y / 4035 * 100}%` }} title={m.name} aria-label={m.name} onClick={() => { setSelected(m.id); setDestination(m.id); setRouting(false); }}><Icon size={13}/><span>{m.name}</span></button>; })}
+        {route && <><div className="route-endpoint route-start" style={{ left: `${startNode.x / 6500 * 100}%`, top: `${startNode.y / 4035 * 100}%` }}><span>بداية المشي</span></div><div className="route-endpoint route-end" style={{ left: `${endNode.x / 6500 * 100}%`, top: `${endNode.y / 4035 * 100}%` }}><span>الوجهة</span></div></>}
+      </div>
+      <div className="map-controls"><button aria-label="تكبير الخريطة" onClick={() => setZoom(z => Math.min(3, z + .25))}><Plus size={19}/></button><button aria-label="تصغير الخريطة" onClick={() => setZoom(z => Math.max(.75, z - .25))}><Minus size={19}/></button><button aria-label="إعادة ضبط الخريطة" onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }}><Maximize size={17}/></button><button aria-label="تحديد موقعي" onClick={locate}><LocateFixed size={18}/></button></div>
+      <div className="map-legend"><i/>مسارات المشروع <span>المداخل تحتاج تأكيدًا ميدانيًا</span></div>
+    </div>
+    {route && <div className="walking-summary" role="status"><Footprints size={22}/><div><strong>{startItem.name} <ArrowLeft size={13}/> {endItem.name}</strong><span>المسار التقريبي: {route.meters} م · {route.minutes} د مشي · سرعة افتراضية ٧٠ م/د</span></div><button aria-label="إخفاء مسار المشي" onClick={() => setRouting(false)}>إخفاء</button></div>}
+    <div className="map-selection"><span className="pin-square"><SelectedIcon size={22}/></span><div><small>{selectedRide?.landName || (selectedItem.kind === 'PRAYER_ROOM' ? 'مكان للصلاة' : selectedItem.kind === 'RESTROOM' ? 'دورات مياه' : 'بريك الأكل')}</small><h3 dir={selectedItem.kind === 'RIDE' || selectedItem.kind === 'RESTAURANT' ? 'ltr' : 'rtl'}>{selectedItem.name}</h3></div><div className="map-selection-actions"><Button variant="outline" onClick={() => { setDestination(selectedItem.id); setShowPlanner(true); setRouting(false); }}><Route size={15}/>امشِ لهنا</Button>{selectedRide && <Button onClick={() => onRide(selected)}>شوف اللعبة<ArrowLeft size={15}/></Button>}</div></div>
+  </div>;
 }
