@@ -1,8 +1,10 @@
 'use client';
-import { useMemo, useState, useRef } from 'react';
-import { MapPin, Plus, Minus, LocateFixed, Route, Navigation, UtensilsCrossed, Maximize, MousePointer2, ArrowLeft, MoonStar, Toilet, Footprints } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { MousePointer2 as MousePointer2Icon, MapPin, LocateFixed, Route, Navigation, UtensilsCrossed, Maximize,  ArrowLeft, MoonStar, Toilet, Footprints } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { parkGraph, rides, findRoute } from '@/lib/sikka-data';
+import {useParkMapView} from './use-park-map-view';
+import {clusterMapMarkers} from '@/lib/park-map-geometry';
 import { toast } from 'sonner';
 
 type Layer = 'rides' | 'places' | 'prayer' | 'restrooms';
@@ -17,26 +19,32 @@ const mapItems = [
   ...parkGraph.rides.map(r => ({ id: r.sourceRideId, name: r.name.replace(' (temporarily closed)', ''), nodeId: r.nodeId, kind: 'RIDE' })),
   ...parkGraph.places.filter(p => ['RESTAURANT', 'PRAYER_ROOM', 'RESTROOM'].includes(p.kind)).map(p => ({ id: p.sourcePlaceId, name: facilityName(p), nodeId: p.nodeId, kind: p.kind })),
 ];
+const mapPositions = mapItems.map(m=>{const n=parkGraph.nodes.find(n=>n.id===m.nodeId)!;return {...m,x:n.x,y:n.y};});
+const mapFitPoints = mapPositions.map(({x,y})=>({x,y}));
 const layerKinds: Record<Layer, string> = { rides: 'RIDE', places: 'RESTAURANT', prayer: 'PRAYER_ROOM', restrooms: 'RESTROOM' };
 const layers = [{ id: 'rides' as Layer, name: 'الألعاب', icon: MapPin }, { id: 'places' as Layer, name: 'المطاعم', icon: UtensilsCrossed }, { id: 'prayer' as Layer, name: 'المصليات', icon: MoonStar }, { id: 'restrooms' as Layer, name: 'دورات المياه', icon: Toilet }];
 export function ParkMap({ compact = false, onRide }: { compact?: boolean; onRide: (s: string) => void; onPlan?: () => void }) {
   const [selected, setSelected] = useState('iron-rattler');
   const [layer, setLayer] = useState<Layer>('rides');
-  const [zoom, setZoom] = useState(1), [pan, setPan] = useState({ x: 0, y: 0 });
+  const map = useParkMapView(mapFitPoints);
+  const [expandedCluster,setExpandedCluster] = useState<string[]>([]);
+  const [imageLoaded,setImageLoaded]=useState(false);
   const [routing, setRouting] = useState(false), [showPlanner, setShowPlanner] = useState(!compact), [imageError, setImageError] = useState(false);
   const [origin, setOrigin] = useState('iron-rattler'), [destination, setDestination] = useState('gearworks-eatery');
-  const drag = useRef<{ x: number; y: number; px: number; py: number } | null>(null);
+
   const selectedItem = mapItems.find(m => m.id === selected)!;
   const selectedRide = rides.find(r => r.slug === selected);
   const route = useMemo(() => routing ? findRoute(origin, destination) : null, [routing, origin, destination]);
-  const markers = mapItems.filter(m => m.kind === layerKinds[layer]);
+  const markers = mapPositions.filter(m => m.kind === layerKinds[layer]);
+  const clusters = clusterMapMarkers(markers, map.view, map.size);
+  const pointStyle = (n:{x:number;y:number}) => ({left:n.x*map.view.scale+map.view.x,top:n.y*map.view.scale+map.view.y});
   const startItem = mapItems.find(m => m.id === origin)!;
   const endItem = mapItems.find(m => m.id === destination)!;
   const startNode = parkGraph.nodes.find(n => n.id === startItem.nodeId)!;
   const endNode = parkGraph.nodes.find(n => n.id === endItem.nodeId)!;
   const SelectedIcon = selectedItem.kind === 'PRAYER_ROOM' ? MoonStar : selectedItem.kind === 'RESTROOM' ? Toilet : selectedItem.kind === 'RESTAURANT' ? UtensilsCrossed : Navigation;
   function selectLayer(next: Layer) {
-    setLayer(next);
+    setLayer(next);setExpandedCluster([]);map.fit();
     const first = mapItems.find(m => m.kind === layerKinds[next]);
     if (first) { setSelected(first.id); setDestination(first.id); }
     setRouting(false);
@@ -44,7 +52,7 @@ export function ParkMap({ compact = false, onRide }: { compact?: boolean; onRide
   function drawRoute() {
     const found = findRoute(origin, destination);
     if (!found) { toast.info('ما لقينا مسار متصل بين النقطتين في بيانات المشروع.'); setRouting(false); return; }
-    setRouting(true);
+    setRouting(true);map.fit();setExpandedCluster([]);
   }
   function locate() {
     if (!navigator.geolocation) { toast.error('جهازك ما يدعم تحديد الموقع'); return; }
@@ -56,16 +64,23 @@ export function ParkMap({ compact = false, onRide }: { compact?: boolean; onRide
   return <div className={`park-map ${compact ? 'compact-map' : ''}`}>
     <div className="map-toolbar"><div className="map-layers">{layers.map(l => <button key={l.id} aria-pressed={layer === l.id} className={layer === l.id ? 'active' : ''} onClick={() => selectLayer(l.id)}><l.icon size={15}/>{l.name}<small>{mapItems.filter(m => m.kind === layerKinds[l.id]).length}</small></button>)}</div><button className="map-plan-toggle" aria-expanded={showPlanner} onClick={() => setShowPlanner(s => !s)}><Footprints size={15}/>{showPlanner ? 'إخفاء مخطط المشي' : 'مسار مشي'}</button></div>
     {showPlanner && <div className="map-route-planner"><label><span>من وين نبدأ؟</span><select aria-label="بداية مسار المشي" value={origin} onChange={e => { setOrigin(e.target.value); setRouting(false); }}>{destinationOptions()}</select></label><Route size={19}/><label><span>وين نروح؟</span><select aria-label="وجهة مسار المشي" value={destination} onChange={e => { setDestination(e.target.value); setRouting(false); }}>{destinationOptions()}</select></label><Button disabled={origin === destination} onClick={drawRoute}>ارسم مسار المشي<Footprints size={16}/></Button></div>}
-    <div className="map-viewport" onPointerDown={e => { if ((e.target as Element).closest('button')) return; drag.current = { x: e.clientX, y: e.clientY, px: pan.x, py: pan.y }; e.currentTarget.setPointerCapture(e.pointerId); }} onPointerMove={e => { if (drag.current) setPan({ x: drag.current.px + e.clientX - drag.current.x, y: drag.current.py + e.clientY - drag.current.y }); }} onPointerUp={() => { drag.current = null; }} onPointerCancel={() => { drag.current = null; }}>
-      <div className="map-surface" style={{ transform: `translate(${pan.x}px,${pan.y}px) scale(${zoom})` }}>
-        {!imageError && <img className="real-park-map" src="/api/media/map" alt="الخريطة المصوّرة للملاهي من مستودع سكة" onError={() => setImageError(true)} draggable={false}/>}
-        <svg preserveAspectRatio="none" viewBox="0 0 6500 4035" className={`map-routes ${imageError ? 'fallback-routes' : ''}`} aria-label="شبكة مسارات المشي من بيانات المشروع"><rect width="6500" height="4035" fill={imageError ? '#e3eed9' : 'transparent'}/>{parkGraph.edges.map(e => <path key={e.id} d={'M' + e.points.map(p => p.join(',')).join('L')} fill="none" stroke={imageError ? '#fff' : '#0B2E8B'} strokeOpacity={imageError ? 1 : .22} strokeWidth={imageError ? 28 : 12} strokeLinecap="round"/>)}{route?.paths.map((p, i) => <path key={i} className="route-highlight" d={'M' + p.map(v => v.join(',')).join('L')} fill="none" stroke="#ed1d2d" strokeWidth="38" strokeLinecap="round"/>)}</svg>
-        {markers.map(m => { const n = parkGraph.nodes.find(n => n.id === m.nodeId); if (!n) return null; const Icon = m.kind === 'PRAYER_ROOM' ? MoonStar : m.kind === 'RESTROOM' ? Toilet : m.kind === 'RESTAURANT' ? UtensilsCrossed : MapPin; return <button key={m.id} className={`map-pin ${m.id === selected ? 'selected' : ''} ${m.kind === 'PRAYER_ROOM' ? 'prayer-pin' : m.kind === 'RESTROOM' ? 'restroom-pin' : m.kind === 'RESTAURANT' ? 'food-pin' : ''}`} style={{ left: `${n.x / 6500 * 100}%`, top: `${n.y / 4035 * 100}%` }} title={m.name} aria-label={m.name} onClick={() => { setSelected(m.id); setDestination(m.id); setRouting(false); }}><Icon size={13}/><span>{m.name}</span></button>; })}
-        {route && <><div className="route-endpoint route-start" style={{ left: `${startNode.x / 6500 * 100}%`, top: `${startNode.y / 4035 * 100}%` }}><span>بداية المشي</span></div><div className="route-endpoint route-end" style={{ left: `${endNode.x / 6500 * 100}%`, top: `${endNode.y / 4035 * 100}%` }}><span>الوجهة</span></div></>}
+    <div className="map-gesture-guide"><MousePointer2Icon/>اسحب للتحريك، وقرّب بأصبعين أو بالتتش باد<span>بالكيبورد: + و − للتقريب · 0 للتوسيط</span></div>
+    <div className="map-viewport" ref={map.viewportRef} tabIndex={0} role="group" aria-label="خريطة المنتزه التفاعلية. اسحب للتحريك، قرّب بأصبعين أو استخدم زائد وناقص من لوحة المفاتيح" {...map.handlers}>
+      <div className="map-surface" style={{transform:`translate(${map.view.x}px,${map.view.y}px) scale(${map.view.scale})`,opacity:map.size.width?1:0}}>
+        {!imageError && <img className="real-park-map" src="/api/media/map" alt="الخريطة المصوّرة للملاهي من مستودع سكة" onError={() => setImageError(true)} onLoad={()=>setImageLoaded(true)} draggable={false}/>}
+        <svg preserveAspectRatio="none" viewBox="0 0 6500 4035" className={`map-routes ${!imageLoaded ? 'fallback-routes' : ''}`} aria-label="شبكة مسارات المشي من بيانات المشروع"><rect width="6500" height="4035" fill={!imageLoaded ? '#12396f' : 'transparent'}/>{parkGraph.edges.map(e => <path key={e.id} d={'M' + e.points.map(p => p.join(',')).join('L')} fill="none" stroke={!imageLoaded ? '#8ac6e1' : '#0B2E8B'} strokeOpacity={!imageLoaded ? .65 : .22} strokeWidth={!imageLoaded ? 16 : 12} strokeLinecap="round"/>)}{route?.paths.map((p, i) => <path key={i} className="route-highlight" d={'M' + p.map(v => v.join(',')).join('L')} fill="none" stroke="#ed1d2d" strokeWidth="38" strokeLinecap="round"/>)}</svg>
       </div>
-      <div className="map-controls"><button aria-label="تكبير الخريطة" onClick={() => setZoom(z => Math.min(3, z + .25))}><Plus size={19}/></button><button aria-label="تصغير الخريطة" onClick={() => setZoom(z => Math.max(.75, z - .25))}><Minus size={19}/></button><button aria-label="إعادة ضبط الخريطة" onClick={() => { setZoom(1); setPan({ x: 0, y: 0 }); }}><Maximize size={17}/></button><button aria-label="تحديد موقعي" onClick={locate}><LocateFixed size={18}/></button></div>
+      <div className="map-markers" aria-label="مواقع المنتزه">{clusters.map(group=>{
+        if(group.items.length>1)return <button key={group.items.map(m=>m.id).join('|')} className={`map-cluster ${group.items.some(m=>m.id===selected)?'contains-selected':''}`} style={{left:group.x,top:group.y}} aria-label={`${group.items.length} مواقع متقاربة: ${group.items.map(m=>m.name).join('، ')}`} onClick={()=>{setExpandedCluster(group.items.map(m=>m.id));map.zoomToPoints(group.items);}}><span>{group.items.length}</span><small>مواقع</small></button>;
+        const m=group.items[0];const Icon=m.kind==='PRAYER_ROOM'?MoonStar:m.kind==='RESTROOM'?Toilet:m.kind==='RESTAURANT'?UtensilsCrossed:MapPin;
+        return <button key={m.id} className={`map-pin ${m.id===selected?'selected':''} ${m.kind==='PRAYER_ROOM'?'prayer-pin':m.kind==='RESTROOM'?'restroom-pin':m.kind==='RESTAURANT'?'food-pin':''}`} style={{left:group.x,top:group.y}} title={m.name} aria-label={m.name} onClick={()=>{setSelected(m.id);setDestination(m.id);setRouting(false);setExpandedCluster([]);}}><Icon size={14}/><span>{m.name}</span></button>;
+      })}</div>
+      {route&&<div className="map-endpoints"><div className="route-endpoint route-start" style={pointStyle(startNode)}><span>بداية المشي</span></div><div className="route-endpoint route-end" style={pointStyle(endNode)}><span>الوجهة</span></div></div>}
+      <div className="map-controls"><button aria-label="توسيط المنتزه وإعادة ضبط الخريطة" onClick={()=>{map.fit();setExpandedCluster([]);}}><Maximize size={18}/></button><button aria-label="تحديد موقعي" onClick={locate}><LocateFixed size={18}/></button></div>
       <div className="map-legend"><i/>مسارات المشروع <span>المداخل تحتاج تأكيدًا ميدانيًا</span></div>
     </div>
+    {!!expandedCluster.length&&<div className="map-cluster-options"><div><strong>مواقع قريبة من بعض</strong><button onClick={()=>setExpandedCluster([])}>إغلاق</button></div><p>قرّبنا المنطقة. اختَر الموقع اللي تبيه:</p><div>{expandedCluster.map(id=>{const m=mapItems.find(m=>m.id===id)!;return <button key={id} onClick={()=>{setSelected(id);setDestination(id);setRouting(false);setExpandedCluster([]);}}><MapPin size={13}/>{m.name}</button>;})}</div></div>}
+    {selectedItem.kind==='PRAYER_ROOM'&&<div className="prayer-access-note"><MoonStar size={16}/><div><strong>مصلى · التخصيص غير مؤكد</strong><span>الموقع متاح على الخريطة، لكن ما عندنا تأكيد إذا المداخل منفصلة للرجال والنساء.</span></div></div>}
     {route && <div className="walking-summary" role="status"><Footprints size={22}/><div><strong>{startItem.name} <ArrowLeft size={13}/> {endItem.name}</strong><span>المسار التقريبي: {route.meters} م · {route.minutes} د مشي · سرعة افتراضية ٧٠ م/د</span></div><button aria-label="إخفاء مسار المشي" onClick={() => setRouting(false)}>إخفاء</button></div>}
     <div className="map-selection"><span className="pin-square"><SelectedIcon size={22}/></span><div><small>{selectedRide?.landName || (selectedItem.kind === 'PRAYER_ROOM' ? 'مكان للصلاة' : selectedItem.kind === 'RESTROOM' ? 'دورات مياه' : 'بريك الأكل')}</small><h3 dir={selectedItem.kind === 'RIDE' || selectedItem.kind === 'RESTAURANT' ? 'ltr' : 'rtl'}>{selectedItem.name}</h3></div><div className="map-selection-actions"><Button variant="outline" onClick={() => { setDestination(selectedItem.id); setShowPlanner(true); setRouting(false); }}><Route size={15}/>امشِ لهنا</Button>{selectedRide && <Button onClick={() => onRide(selected)}>شوف اللعبة<ArrowLeft size={15}/></Button>}</div></div>
   </div>;
