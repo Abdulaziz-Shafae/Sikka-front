@@ -14,7 +14,7 @@ export function TeamPage() {
     </section>
     <div className="team-grid">{sikkaTeam.map((member, i) => <motion.article key={member.name} className={`team-card team-${member.color}`} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * .07 }}>
       <div className="team-card-top"><span className="team-number">0{i + 1}</span><Code2 size={21}/></div>
-      <span className="team-avatar">{member.initial}</span><h2>{member.name}</h2><p>من فريق سكة</p>
+      <h2 className="team-member-name">{member.name}</h2><p>من فريق سكة</p>{member.linkedinUrl&&<div className="team-qr"><a href={member.linkedinUrl} target="_blank" rel="noopener noreferrer" aria-label={`افتح حساب ${member.name} من رمز QR`}><img src={member.qrImage} alt={`رمز QR لحساب ${member.name} في لنكدن`} width="192" height="192"/></a><span>امسح الكود وخلّنا نتواصل</span></div>}
       <div className="team-card-bottom">{member.linkedinUrl ? <a href={member.linkedinUrl} target="_blank" rel="noopener noreferrer" aria-label={`حساب ${member.name} في لنكدن`}><Linkedin size={19}/>نتواصل على لنكدن<ArrowUpRight size={17}/></a> : <span className="team-link-pending"><Linkedin size={19}/>بانتظار رابط حساب لنكدن</span>}</div>
     </motion.article>)}</div>
     <p className="team-link-note">ودّك تعرفنا أكثر؟ تلقانا على لنكدن، وحياك بسكتنا.</p>
