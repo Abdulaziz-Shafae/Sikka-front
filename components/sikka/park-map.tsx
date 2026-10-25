@@ -71,12 +71,11 @@ export function ParkMap({ compact = false, onRide }: { compact?: boolean; onRide
         {/* Tile only empty soil from the source image; rides and routes stay untouched. */}
         <svg className="map-terrain" width="6500" height="4035" aria-hidden="true">
           <defs>
-            <filter id={`${terrainId}-soften`} x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="35"/></filter>
             <svg id={`${terrainId}-soil`} width="600" height="600" viewBox="2000 1500 600 600" overflow="hidden">
               <image href="/api/media/map" width="6500" height="4035"/>
             </svg>
             <pattern id={`${terrainId}-terrain`} width="1200" height="1200" patternUnits="userSpaceOnUse">
-              <g filter={`url(#${terrainId}-soften)`}><use href={`#${terrainId}-soil`}/>
+              <g><use href={`#${terrainId}-soil`}/>
               <use href={`#${terrainId}-soil`} transform="translate(1200 0) scale(-1 1)"/>
               <use href={`#${terrainId}-soil`} transform="translate(0 1200) scale(1 -1)"/>
               <use href={`#${terrainId}-soil`} transform="translate(1200 1200) scale(-1 -1)"/></g>
