@@ -31,3 +31,8 @@ body{background:#dce7fa}.sikka-app{background:radial-gradient(ellipse at 90% 20%
 .sikka-app main{background-image:url('/brand/park-backdrop.svg'),radial-gradient(#0b2e8b0b 1px,transparent 1px);background-size:1600px 1240px,22px 22px;background-position:center -15px,center;background-repeat:repeat-y,repeat}.hero,.map-home-section,.team-intro,.recap-hero{position:relative}
 @media(max-width:800px){.sikka-app main{background-size:1000px 775px,22px 22px;background-position:center top,center}}
 @media(max-width:560px){.sikka-app main{background-size:760px 589px,20px 20px;background-position:60% top,center}}
+
+/* Earth continues beyond the source photo when the map is centered or zoomed out. */
+.map-viewport{background:#281e1b}
+.map-terrain{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
+.real-park-map{mask-image:linear-gradient(to right,transparent,#000 300px,#000 calc(100% - 300px),transparent),linear-gradient(to bottom,transparent,#000 300px,#000 calc(100% - 300px),transparent);mask-composite:intersect}

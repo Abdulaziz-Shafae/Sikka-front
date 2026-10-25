@@ -1,5 +1,5 @@
 'use client';
-import { useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import { MousePointer2 as MousePointer2Icon, MapPin, LocateFixed, Route, Navigation, UtensilsCrossed, Maximize,  ArrowLeft, MoonStar, Toilet, Footprints } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { parkGraph, rides, findRoute } from '@/lib/sikka-data';
@@ -24,6 +24,7 @@ const mapFitPoints = mapPositions.map(({x,y})=>({x,y}));
 const layerKinds: Record<Layer, string> = { rides: 'RIDE', places: 'RESTAURANT', prayer: 'PRAYER_ROOM', restrooms: 'RESTROOM' };
 const layers = [{ id: 'rides' as Layer, name: 'الألعاب', icon: MapPin }, { id: 'places' as Layer, name: 'المطاعم', icon: UtensilsCrossed }, { id: 'prayer' as Layer, name: 'المصليات', icon: MoonStar }, { id: 'restrooms' as Layer, name: 'دورات المياه', icon: Toilet }];
 export function ParkMap({ compact = false, onRide }: { compact?: boolean; onRide: (s: string) => void; onPlan?: () => void }) {
+  const terrainId = useId().replace(/:/g, '');
   const [selected, setSelected] = useState('iron-rattler');
   const [layer, setLayer] = useState<Layer>('rides');
   const map = useParkMapView(mapFitPoints);
@@ -67,8 +68,24 @@ export function ParkMap({ compact = false, onRide }: { compact?: boolean; onRide
     <div className="map-gesture-guide"><MousePointer2Icon/>اسحب للتحريك، وقرّب بأصبعين أو بالتتش باد<span>بالكيبورد: + و − للتقريب · 0 للتوسيط</span></div>
     <div className="map-viewport" ref={map.viewportRef} tabIndex={0} role="group" aria-label="خريطة المنتزه التفاعلية. اسحب للتحريك، قرّب بأصبعين أو استخدم زائد وناقص من لوحة المفاتيح" {...map.handlers}>
       <div className="map-surface" style={{transform:`translate(${map.view.x}px,${map.view.y}px) scale(${map.view.scale})`,opacity:map.size.width?1:0}}>
+        {/* Tile only empty soil from the source image; rides and routes stay untouched. */}
+        <svg className="map-terrain" width="6500" height="4035" aria-hidden="true">
+          <defs>
+            <filter id={`${terrainId}-soften`} x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="35"/></filter>
+            <svg id={`${terrainId}-soil`} width="600" height="600" viewBox="2000 1500 600 600" overflow="hidden">
+              <image href="/api/media/map" width="6500" height="4035"/>
+            </svg>
+            <pattern id={`${terrainId}-terrain`} width="1200" height="1200" patternUnits="userSpaceOnUse">
+              <g filter={`url(#${terrainId}-soften)`}><use href={`#${terrainId}-soil`}/>
+              <use href={`#${terrainId}-soil`} transform="translate(1200 0) scale(-1 1)"/>
+              <use href={`#${terrainId}-soil`} transform="translate(0 1200) scale(1 -1)"/>
+              <use href={`#${terrainId}-soil`} transform="translate(1200 1200) scale(-1 -1)"/></g>
+            </pattern>
+          </defs>
+          <rect x="-50000" y="-50000" width="106500" height="104035" fill={`url(#${terrainId}-terrain)`}/>
+        </svg>
         {!imageError && <img className="real-park-map" src="/api/media/map" alt="الخريطة المصوّرة للملاهي من مستودع سكة" onError={() => setImageError(true)} onLoad={()=>setImageLoaded(true)} draggable={false}/>}
-        <svg preserveAspectRatio="none" viewBox="0 0 6500 4035" className={`map-routes ${!imageLoaded ? 'fallback-routes' : ''}`} aria-label="شبكة مسارات المشي من بيانات المشروع"><rect width="6500" height="4035" fill={!imageLoaded ? '#12396f' : 'transparent'}/>{parkGraph.edges.map(e => <path key={e.id} d={'M' + e.points.map(p => p.join(',')).join('L')} fill="none" stroke={!imageLoaded ? '#8ac6e1' : '#0B2E8B'} strokeOpacity={!imageLoaded ? .65 : .22} strokeWidth={!imageLoaded ? 16 : 12} strokeLinecap="round"/>)}{route?.paths.map((p, i) => <path key={i} className="route-highlight" d={'M' + p.map(v => v.join(',')).join('L')} fill="none" stroke="#ed1d2d" strokeWidth="38" strokeLinecap="round"/>)}</svg>
+        <svg preserveAspectRatio="none" viewBox="0 0 6500 4035" className={`map-routes ${!imageLoaded ? 'fallback-routes' : ''}`} aria-label="شبكة مسارات المشي من بيانات المشروع"><rect width="6500" height="4035" fill="transparent"/>{parkGraph.edges.map(e => <path key={e.id} d={'M' + e.points.map(p => p.join(',')).join('L')} fill="none" stroke={!imageLoaded ? '#8ac6e1' : '#0B2E8B'} strokeOpacity={!imageLoaded ? .65 : .22} strokeWidth={!imageLoaded ? 16 : 12} strokeLinecap="round"/>)}{route?.paths.map((p, i) => <path key={i} className="route-highlight" d={'M' + p.map(v => v.join(',')).join('L')} fill="none" stroke="#ed1d2d" strokeWidth="38" strokeLinecap="round"/>)}</svg>
       </div>
       <div className="map-markers" aria-label="مواقع المنتزه">{clusters.map(group=>{
         if(group.items.length>1)return <button key={group.items.map(m=>m.id).join('|')} className={`map-cluster ${group.items.some(m=>m.id===selected)?'contains-selected':''}`} style={{left:group.x,top:group.y}} aria-label={`${group.items.length} مواقع متقاربة: ${group.items.map(m=>m.name).join('، ')}`} onClick={()=>{setExpandedCluster(group.items.map(m=>m.id));map.zoomToPoints(group.items);}}><span>{group.items.length}</span><small>مواقع</small></button>;
