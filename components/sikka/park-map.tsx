@@ -1,10 +1,12 @@
 'use client';
-import { useId, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
 import { MousePointer2 as MousePointer2Icon, MapPin, LocateFixed, Route, Navigation, UtensilsCrossed, Maximize,  ArrowLeft, MoonStar, Toilet, Footprints } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { parkGraph, rides, findRoute } from '@/lib/sikka-data';
 import {useParkMapView} from './use-park-map-view';
 import {clusterMapMarkers} from '@/lib/park-map-geometry';
+import {cuisines} from '@/lib/food-flow';
+import {sikkaApi,type Restaurant} from '@/lib/sikka-api';
 import { toast } from 'sonner';
 
 type Layer = 'rides' | 'places' | 'prayer' | 'restrooms';
@@ -23,10 +25,13 @@ const mapPositions = mapItems.map(m=>{const n=parkGraph.nodes.find(n=>n.id===m.n
 const mapFitPoints = mapPositions.map(({x,y})=>({x,y}));
 const layerKinds: Record<Layer, string> = { rides: 'RIDE', places: 'RESTAURANT', prayer: 'PRAYER_ROOM', restrooms: 'RESTROOM' };
 const layers = [{ id: 'rides' as Layer, name: 'الألعاب', icon: MapPin }, { id: 'places' as Layer, name: 'المطاعم', icon: UtensilsCrossed }, { id: 'prayer' as Layer, name: 'المصليات', icon: MoonStar }, { id: 'restrooms' as Layer, name: 'دورات المياه', icon: Toilet }];
-export function ParkMap({ compact = false, onRide }: { compact?: boolean; onRide: (s: string) => void; onPlan?: () => void }) {
+export function ParkMap({ compact = false, onRide, itinerary=[] }: { itinerary?:{key:string;title:string;completed:boolean}[]; compact?: boolean; onRide: (s: string) => void; onPlan?: () => void }) {
+  const [foodFilters,setFoodFilters]=useState<string[]>([]),[restaurants,setRestaurants]=useState<Restaurant[]>([]),[foodError,setFoodError]=useState('');
+
   const terrainId = useId().replace(/:/g, '');
   const [selected, setSelected] = useState('iron-rattler');
   const [layer, setLayer] = useState<Layer>('rides');
+  useEffect(()=>{if(layer!=='places')return;let active=true;sikkaApi.restaurants().then(data=>{if(active){setRestaurants(data);setFoodError('');}}).catch(e=>{if(active)setFoodError(e.message);});return()=>{active=false;};},[layer]);
   const map = useParkMapView(mapFitPoints);
   const [expandedCluster,setExpandedCluster] = useState<string[]>([]);
   const [imageLoaded,setImageLoaded]=useState(false);
@@ -36,7 +41,7 @@ export function ParkMap({ compact = false, onRide }: { compact?: boolean; onRide
   const selectedItem = mapItems.find(m => m.id === selected)!;
   const selectedRide = rides.find(r => r.slug === selected);
   const route = useMemo(() => routing ? findRoute(origin, destination) : null, [routing, origin, destination]);
-  const markers = mapPositions.filter(m => m.kind === layerKinds[layer]);
+  const markers = mapPositions.filter(m => m.kind === layerKinds[layer]&&(layer!=='places'||!foodFilters.length||restaurants.some(p=>p.name.toLowerCase()===m.name.toLowerCase()&&p.cuisineTypes.some(c=>foodFilters.includes(c)))));
   const clusters = clusterMapMarkers(markers, map.view, map.size);
   const pointStyle = (n:{x:number;y:number}) => ({left:n.x*map.view.scale+map.view.x,top:n.y*map.view.scale+map.view.y});
   const startItem = mapItems.find(m => m.id === origin)!;
@@ -65,6 +70,8 @@ export function ParkMap({ compact = false, onRide }: { compact?: boolean; onRide
   return <div className={`park-map ${compact ? 'compact-map' : ''}`}>
     <div className="map-toolbar"><div className="map-layers">{layers.map(l => <button key={l.id} aria-pressed={layer === l.id} className={layer === l.id ? 'active' : ''} onClick={() => selectLayer(l.id)}><l.icon size={15}/>{l.name}<small>{mapItems.filter(m => m.kind === layerKinds[l.id]).length}</small></button>)}</div><button className="map-plan-toggle" aria-expanded={showPlanner} onClick={() => setShowPlanner(s => !s)}><Footprints size={15}/>{showPlanner ? 'إخفاء مخطط المشي' : 'مسار مشي'}</button></div>
     {showPlanner && <div className="map-route-planner"><label><span>من وين نبدأ؟</span><select aria-label="بداية مسار المشي" value={origin} onChange={e => { setOrigin(e.target.value); setRouting(false); }}>{destinationOptions()}</select></label><Route size={19}/><label><span>وين نروح؟</span><select aria-label="وجهة مسار المشي" value={destination} onChange={e => { setDestination(e.target.value); setRouting(false); }}>{destinationOptions()}</select></label><Button disabled={origin === destination} onClick={drawRoute}>ارسم مسار المشي<Footprints size={16}/></Button></div>}
+    {layer==='places'&&<div className="food-map-filters"><div className="filter-chips">{Object.entries(cuisines).map(([k,l])=><button key={k} aria-pressed={foodFilters.includes(k)} className={foodFilters.includes(k)?'active':''} onClick={()=>setFoodFilters(a=>a.includes(k)?a.filter(x=>x!==k):[...a,k])}>{l}</button>)}</div>{foodError&&<p role="status">{foodError} تصنيف المطاعم حسب النوع يحتاج بيانات الخدمة.</p>}</div>}
+    {!!itinerary.length&&<ol className="map-itinerary">{itinerary.map((a,i)=><li key={a.key} className={a.completed?'done':itinerary.find(x=>!x.completed)?.key===a.key?'next':''}>{a.completed?'✓':i+1} · {a.title}</li>)}</ol>}
     <div className="map-gesture-guide"><MousePointer2Icon/>اسحب للتحريك، وقرّب بأصبعين أو بالتتش باد<span>بالكيبورد: + و − للتقريب · 0 للتوسيط</span></div>
     <div className="map-viewport" ref={map.viewportRef} tabIndex={0} role="group" aria-label="خريطة المنتزه التفاعلية. اسحب للتحريك، قرّب بأصبعين أو استخدم زائد وناقص من لوحة المفاتيح" {...map.handlers}>
       <div className="map-surface" style={{transform:`translate(${map.view.x}px,${map.view.y}px) scale(${map.view.scale})`,opacity:map.size.width?1:0}}>
@@ -89,7 +96,7 @@ export function ParkMap({ compact = false, onRide }: { compact?: boolean; onRide
       <div className="map-markers" aria-label="مواقع المنتزه">{clusters.map(group=>{
         if(group.items.length>1)return <button key={group.items.map(m=>m.id).join('|')} className={`map-cluster ${group.items.some(m=>m.id===selected)?'contains-selected':''}`} style={{left:group.x,top:group.y}} aria-label={`${group.items.length} مواقع متقاربة: ${group.items.map(m=>m.name).join('، ')}`} onClick={()=>{setExpandedCluster(group.items.map(m=>m.id));map.zoomToPoints(group.items);}}><span>{group.items.length}</span><small>مواقع</small></button>;
         const m=group.items[0];const Icon=m.kind==='PRAYER_ROOM'?MoonStar:m.kind==='RESTROOM'?Toilet:m.kind==='RESTAURANT'?UtensilsCrossed:MapPin;
-        return <button key={m.id} className={`map-pin ${m.id===selected?'selected':''} ${m.kind==='PRAYER_ROOM'?'prayer-pin':m.kind==='RESTROOM'?'restroom-pin':m.kind==='RESTAURANT'?'food-pin':''}`} style={{left:group.x,top:group.y}} title={m.name} aria-label={m.name} onClick={()=>{setSelected(m.id);setDestination(m.id);setRouting(false);setExpandedCluster([]);}}><Icon size={14}/><span>{m.name}</span></button>;
+        return <button key={m.id} className={`map-pin ${m.id===selected?'selected':''} ${m.kind==='PRAYER_ROOM'?'prayer-pin':m.kind==='RESTROOM'?'restroom-pin':m.kind==='RESTAURANT'?'food-pin':''}`} style={{left:group.x,top:group.y}} title={m.name} aria-label={m.name} onClick={()=>{setSelected(m.id);setDestination(m.id);setRouting(false);setExpandedCluster([]);}}>{itinerary.some(a=>a.key===m.id&&a.completed)?<span aria-label="مكتملة">✓</span>:<Icon size={14}/>}<span>{m.name}</span></button>;
       })}</div>
       {route&&<div className="map-endpoints"><div className="route-endpoint route-start" style={pointStyle(startNode)}><span>بداية المشي</span></div><div className="route-endpoint route-end" style={pointStyle(endNode)}><span>الوجهة</span></div></div>}
       <div className="map-controls"><button aria-label="توسيط المنتزه وإعادة ضبط الخريطة" onClick={()=>{map.fit();setExpandedCluster([]);}}><Maximize size={18}/></button><button aria-label="تحديد موقعي" onClick={locate}><LocateFixed size={18}/></button></div>

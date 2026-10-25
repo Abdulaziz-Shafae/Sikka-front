@@ -1,3 +1,4 @@
+import {type FoodPreferences} from './food-flow';
 import catalogue from './park-catalogue.json';
 import graph from './park-routes.json';
 export const lands: Record<string,string> = {CITY_OF_THRILLS:'مدينة التشويق',STEAM_TOWN:'ستيم تاون',GRAND_EXPOSITION:'المعرض الكبير',TWILIGHT_GARDENS:'حدائق الغسق',DISCOVERY_SPRINGS:'ينابيع الاكتشاف',VALLEY_OF_FORTUNE:'وادي الكنوز',CITADEL:'القلعة'};
@@ -16,8 +17,22 @@ export const parkGraph=graph;
 export const categoryName:Record<string,string>={THRILL:'حماس عالي',FAMILY:'مع العائلة',KIDS:'للصغار',ARCADE:'ألعاب كرنفال',WATER:'مغامرة مائية'};
 export const meals=[{name:'Gearworks Eatery',land:'ستيم تاون',type:'مطعم',style:'meal-orange'},{name:"Primo’s Pizzeria",land:'مدينة التشويق',type:'بيتزا',style:'meal-red'},{name:'Coffee & Treats',land:'ينابيع الاكتشاف',type:'قهوة وسناك',style:'meal-blue'}];
 export const initialVisit={id:'demo',name:'طلعة الشباب',type:'FRIENDS',date:'2026-10-31',duration:240,arrival:'16:00',together:'SPLIT',goal:'ألعاب أكثر',prayer:true,meal:'وجبة وسناك',restaurant:'Gearworks Eatery',members:['عبدالعزيز','محمد','نواف'],selected:['iron-rattler','sirocco-tower'],status:'DRAFT',paid:false,approved:false,completed:[] as string[],ratings:{} as Record<string,number>};
-export type Visit=typeof initialVisit;
+export type Visit=typeof initialVisit & {food?:FoodPreferences};
 export function makeActivities(v:Visit){
+  if(v.food){
+    const breaks=v.food.breaks;
+    const reserved=breaks.reduce((n,b)=>n+(b.kind==='MEAL'?60:30),0);
+    const selected=v.selected.slice(0,Math.max(0,Math.floor((v.duration-reserved)/45)));
+    const tasks:{key:string;title:string;kind:string;minutes:number;offset:number;participants:string[]}[]=[];
+    let offset=0;
+    const pending=[...breaks];
+    function addBreak(b:typeof breaks[number]){tasks.push({key:b.key,title:b.restaurant||(b.kind==='MEAL'?'وجبة · المطعم نختاره بعدين':'وقت السناك · المكان نختاره بعدين'),kind:b.kind,minutes:b.kind==='MEAL'?60:30,offset,participants:v.members});offset+=b.kind==='MEAL'?60:30;}
+    function flush(timing:string){for(const b of [...pending])if(b.timing===timing){addBreak(b);pending.splice(pending.indexOf(b),1);}}
+    flush('START');
+    selected.forEach((slug,i)=>{if(i===Math.ceil(selected.length/2)){flush('MIDDLE');flush('AUTO');}tasks.push({key:slug,title:rides.find(r=>r.slug===slug)?.name||slug,kind:'RIDE',minutes:35,offset,participants:v.together==='TOGETHER'||v.members.length<2?v.members:i%2===0?v.members.slice(0,Math.ceil(v.members.length/2)):v.members.slice(Math.ceil(v.members.length/2))});offset+=45;});
+    pending.forEach(addBreak);
+    return tasks;
+  }
   const selected=v.selected.length?v.selected:['iron-rattler','sirocco-tower'];
   const hasMeal=v.meal==='وجبة'||v.meal==='وجبة وسناك';
   const hasSnack=v.meal==='سناك'||v.meal==='وجبة وسناك';
