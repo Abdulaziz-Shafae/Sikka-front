@@ -36,3 +36,7 @@ body{background:#dce7fa}.sikka-app{background:radial-gradient(ellipse at 90% 20%
 .map-viewport{background:#281e1b}
 .map-terrain{position:absolute;left:0;top:0;overflow:visible;pointer-events:none}
 .real-park-map{mask-image:linear-gradient(to right,transparent,#000 300px,#000 calc(100% - 300px),transparent),linear-gradient(to bottom,transparent,#000 300px,#000 calc(100% - 300px),transparent);mask-composite:intersect}
+
+.food-settings{max-width:850px;display:grid;gap:22px}.food-settings .filter-chips{flex-wrap:wrap}.food-break-card{padding:24px;background:#eff4fd;border:1px solid #cbdaf3;border-radius:16px;margin-bottom:20px}.food-break-card .meal-card{padding:22px;min-height:120px}.food-break-card .meal-grid{margin:18px 0}.food-break-card>p{margin:12px 0}@media(max-width:560px){.food-break-card{padding:16px}.food-break-card .meal-grid{grid-template-columns:1fr}.food-settings{padding:18px}}
+
+.food-map-filters{padding:14px}.food-map-filters .filter-chips{flex-wrap:wrap}.food-map-filters p{font-size:12px}.map-itinerary{display:flex;gap:10px;overflow:auto;padding:14px;list-style:none;background:#eaf0fc}.map-itinerary li{white-space:nowrap;padding:8px 12px;border-radius:8px;background:#fff;font-size:12px}.map-itinerary .done{color:#167238}.map-itinerary .next{background:#ffc928;color:#0b2e8b;box-shadow:0 0 12px #ffc92880}
