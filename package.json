@@ -14,7 +14,11 @@
     "db:generate": "drizzle-kit generate",
     "generate:team-qr": "node --experimental-strip-types scripts/generate-team-qr.mjs",
     "typecheck": "tsc --noEmit",
-    "check:flows": "node scripts/checks/ui-flow.cjs && node scripts/checks/food-flow.cjs && node scripts/checks/planning-readiness.cjs"
+    "check:flows": "node scripts/checks/ui-flow.cjs && node scripts/checks/food-flow.cjs && node scripts/checks/planning-readiness.cjs",
+    "build:railway": "node scripts/railway-runtime.mjs build",
+    "start:railway": "node scripts/railway-runtime.mjs start",
+    "check:integration": "node scripts/checks/integration-contract.cjs",
+    "check:production": "node scripts/checks/production-http.cjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",

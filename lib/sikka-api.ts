@@ -1,8 +1,8 @@
 import graph from './park-routes.json';
 // Place contract reviewed against SIKKA feature/final-flows-review.
 export type Restaurant={id:number;name:string;kind:string;cuisineTypes:string[]};
-const API=process.env.NEXT_PUBLIC_SIKKA_API_URL||'';
-export async function apiRequest(path:string,method='GET',body?:unknown){if(!API)throw new Error('لم يتم ضبط رابط خادم سكة. هذه الخدمة غير متاحة حاليًا.');const res=await fetch(`${API.replace(/\/$/,'')}${path}`,{method,credentials:'include',headers:{...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined});const data:unknown=await res.json().catch(()=>null);if(!res.ok)throw new Error(typeof data==='object'&&data!==null&&'message' in data?String(data.message):'تعذر إكمال الطلب');return data;}
+export {apiRequest} from './api-client';
+import {apiRequest} from './api-client';
 // Live integration is explicit: setting the server URL alone does not replace demo data.
 export const isDemoMode=process.env.NEXT_PUBLIC_SIKKA_DEMO_MODE!=='false';
 export const demoRestaurants:Restaurant[]=graph.places.filter(p=>p.kind==='RESTAURANT').map((p,i)=>({id:i+1,name:p.name,kind:p.kind,cuisineTypes:[['NORTH_AMERICAN','MIDDLE_EASTERN','MEXICAN','INDIAN','ITALIAN','PAN_ASIAN','MULTINATIONAL'][i%7]]}));

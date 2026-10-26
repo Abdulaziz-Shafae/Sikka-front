@@ -18,7 +18,7 @@ export function normalizeStoredPlan(details:ApiPlanDetails,catalogue:ApiRide[],m
   for(const n of [item.relativeStartMinutes,item.relativeEndMinutes,item.walkingMinutes,item.waitingMinutes,item.activityMinutes])if(!Number.isInteger(n)||n<0)throw new Error('أوقات النشاط غير صالحة');
   if(item.relativeEndMinutes-item.relativeStartMinutes!==item.walkingMinutes+item.waitingMinutes+item.activityMinutes)throw new Error('مدد النشاط لا تطابق توقيته');
   const ride=item.rideId?catalogue.find(r=>r.id===item.rideId):undefined;
-  return {key:'plan-item-'+item.id,planItemId:item.id,rideId:item.rideId||undefined,placeId:item.placeId||undefined,rideSlug:ride?.sourceRideId,title:item.title,kind:item.activityKind==='BREAK'?item.breakType||'PLACE':item.activityKind,start:item.relativeStartMinutes,end:item.relativeEndMinutes,walking:item.walkingMinutes,waiting:item.waitingMinutes,duration:item.activityMinutes,participants:ids.map(String),priority:item.priority||undefined,pinned:item.pinned,records:{},startsAt:item.startsAt||undefined,endsAt:item.endsAt||undefined,rateable:item.isRateable||item.activityKind==='RIDE'};
+  return {key:'plan-item-'+item.id,planItemId:item.id,rideId:item.rideId||undefined,placeId:item.placeId||undefined,rideSlug:ride?.sourceRideId,title:item.title,kind:item.activityKind==='BREAK'?item.breakType||'PLACE':item.activityKind,start:item.relativeStartMinutes,end:item.relativeEndMinutes,walking:item.walkingMinutes,waiting:item.waitingMinutes,duration:item.activityMinutes,participants:ids.map(String),priority:item.priority||undefined,pinned:item.pinned,records:{},startsAt:item.startsAt||undefined,endsAt:item.endsAt||undefined,rateable:item.isRateable};
  }
  const activities=details.planItems.map(activity).sort((a,b)=>a.start-b.start);
  const excluded=(details.excludedRides||[]).map(x=>({rideId:x.rideId,rideSlug:catalogue.find(r=>r.id===x.rideId)?.sourceRideId,title:x.rideName,member:String(x.visitMemberId),priority:x.priority,reasonCode:x.reasonCode,reason:x.reasonMessage||'لم يصل سبب موثّق من الخادم؛ نحتاج مراجعة الخطة.'}));
@@ -54,7 +54,7 @@ export const backendApi={
  correctCompleted:(dto:unknown)=>apiRequest('/api/v1/visit-record/update/complete','PUT',dto),
  correctSkipped:(dto:unknown)=>apiRequest('/api/v1/visit-record/update/skip','PUT',dto),
  rateRide:(dto:unknown)=>apiRequest('/api/v1/visit-record/rate','PUT',dto),
- completeActivity:(id:number)=>apiRequest(`/api/v1/activity-session/complete/${positive(id)}`,'POST'),
+ completeActivity:(id:number,requestKey:string)=>apiRequest(`/api/v1/activity-session/complete/${positive(id)}`,'POST',{requestKey}),
  rateActivity:(id:number,dto:unknown)=>apiRequest(`/api/v1/activity-session/rate/${positive(id)}`,'PUT',dto),
  review:(id:number,dto:unknown)=>apiRequest(`/api/v1/visit-member/review/${positive(id)}`,'PUT',dto),
  reuse:(id:number,visitDate:string)=>apiRequest(`/api/v1/visit/reuse/${positive(id)}`,'POST',{visitDate}),

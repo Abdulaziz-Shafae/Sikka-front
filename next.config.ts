@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  distDir: process.env.SIKKA_RAILWAY_NODE === '1' ? '.next-railway' : '.next',
 };
 
 export default nextConfig;

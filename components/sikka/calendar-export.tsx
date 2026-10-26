@@ -4,6 +4,7 @@ import {CalendarDays, ChevronLeft, ArrowRight, Download, ExternalLink, RefreshCw
 import {Button} from '@/components/ui/button';
 import {Dialog,DialogContent,DialogDescription,DialogHeader,DialogTitle} from '@/components/ui/dialog';
 import {toast} from 'sonner';
+import {apiResponse} from '@/lib/api-client';
 import {apiRequest,isDemoMode} from '@/lib/sikka-api';
 import {type Visit,makeActivities} from '@/lib/sikka-data';
 
@@ -47,7 +48,7 @@ export function CalendarExport({visit}:{visit:Visit}){
     try{
       let url=demoGoogleLink(visit);
       if(!isDemoMode&&API&&backendId!==null){
-        const response=await fetch(API+'/api/v1/google-calendar/manual/'+backendId,{credentials:'include'});
+        const response=await apiResponse('/api/v1/google-calendar/manual/'+backendId);
         if(!response.ok)throw new Error('ما قدرنا نجيب رابط التقويم من سكة، تأكد إنك مسجل دخول');
         const result=await response.json() as {url?:string};
         if(!result.url)throw new Error('رابط التقويم غير متاح');
@@ -63,7 +64,7 @@ export function CalendarExport({visit}:{visit:Visit}){
     try{
       let blob:Blob;
       if(!isDemoMode&&API&&backendId!==null){
-        const response=await fetch(API+'/api/v1/google-calendar/apple/'+backendId,{credentials:'include'});
+        const response=await apiResponse('/api/v1/google-calendar/apple/'+backendId);
         if(!response.ok)throw new Error('ما قدرنا ننزّل ملف Apple Calendar، تأكد إنك مسجل دخول');
         blob=await response.blob();
       }else blob=new Blob([demoIcs(visit)],{type:'text/calendar;charset=utf-8'});
