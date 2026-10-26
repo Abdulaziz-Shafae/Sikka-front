@@ -2,16 +2,18 @@ import type {RidePriority,UiPlan} from './planning-ui';
 import {type FoodPreferences} from './food-flow';
 import catalogue from './park-catalogue.json';
 import graph from './park-routes.json';
+import parkMedia from './park-media.json';
 export const lands: Record<string,string> = {CITY_OF_THRILLS:'مدينة التشويق',STEAM_TOWN:'ستيم تاون',GRAND_EXPOSITION:'المعرض الكبير',TWILIGHT_GARDENS:'حدائق الغسق',DISCOVERY_SPRINGS:'ينابيع الاكتشاف',VALLEY_OF_FORTUNE:'وادي الكنوز',CITADEL:'القلعة'};
-export const photos:Record<string,{url:string;credit:string;source:string}> = {
+export const photos:Record<string,{url:string;credit:string;source:string;local?:string;frame?:{width:number;height:number;viewBox:string}}> = {
+...parkMedia,
 falcon:{url:'https://www.intamin.com/wp-content/uploads/2026/02/IAR_SoMe_Falcons100Procent_20263.jpg',credit:'Intamin',source:'https://www.intamin.com/project/falcons-flight/'},
 iron:{url:'https://rcdb.com/aaiulga',credit:'RCDB',source:'https://rcdb.com/21312.htm'},
 sirocco:{url:'https://pbs.twimg.com/media/HBi1IIEbUAI-o6F.jpg',credit:'Attractions 360°',source:'https://x.com/SoCal360/status/2024567187709861984'},
 park:{url:'https://blooloop.com/media-library/falcons-flight-at-six-flags-qiddiya-city.jpg?id=63059559&width=1600',credit:'Intamin / blooloop',source:'https://blooloop.com/intamin-six-flags-qiddiya-city/'},
 map:{url:'https://raw.githubusercontent.com/Abdulaziz-Shafae/SIKKA/7fca9f36274eaaa32011ce82645bbc53aa78df33/src/main/resources/static/maps/park-map.jpg',credit:'خريطة المشروع',source:'https://github.com/Abdulaziz-Shafae/SIKKA'}
 };
-const descriptions:Record<string,string>={'falcons-flight':'حلّق فوق هضاب طويق، وخذ جرعتك من الحماس.','iron-rattler':'منعطفات ومغامرة وسط عالم ستيم تاون.','sirocco-tower':'إطلالة من فوق… ولحظة ما تنساها.'};
-export const rides=catalogue.map((r,i)=>({...r,id:i+1,slug:r.sourceRideId,landName:lands[r.land]||r.land,description:descriptions[r.sourceRideId]||'تجربة جديدة تضيفها لذكريات يومك في الملاهي.',photo:r.sourceRideId==='falcons-flight'?'falcon':r.sourceRideId==='iron-rattler'?'iron':r.sourceRideId==='sirocco-tower'?'sirocco':null}));
+const descriptions:Record<string,string>={'falcons-flight':'حلّق فوق هضاب طويق، وخذ جرعتك من الحماس','iron-rattler':'منعطفات ومغامرة وسط عالم ستيم تاون','sirocco-tower':'إطلالة من فوق… ولحظة ما تنساها'};
+export const rides=catalogue.map((r,i)=>({...r,id:i+1,slug:r.sourceRideId,landName:lands[r.land]||r.land,description:descriptions[r.sourceRideId]||'تجربة جديدة تضيفها لذكريات يومك في الملاهي',photo:r.sourceRideId}));
 export type Ride=typeof rides[number];
 export const featured=['falcons-flight','iron-rattler','sirocco-tower'].map(id=>rides.find(r=>r.slug===id)!);
 export const parkGraph=graph;

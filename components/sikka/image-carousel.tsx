@@ -1,0 +1,20 @@
+'use client';
+import {useEffect,useRef,useState} from 'react';
+import {ArrowLeft,ArrowRight} from 'lucide-react';
+import {photos} from '@/lib/sikka-data';
+
+export function ImageCarousel({assets,label,className='',compact=false,onOpen,eager=false}:{assets:string[];label:string;className?:string;compact?:boolean;onOpen?:()=>void;eager?:boolean}){
+ const [index,setIndex]=useState(0),[paused,setPaused]=useState(false),[visible,setVisible]=useState(false),[reduced,setReduced]=useState(false),[hidden,setHidden]=useState(false);
+ const root=useRef<HTMLDivElement>(null),pointer=useRef<{x:number;y:number}|null>(null),swiped=useRef(false),resume=useRef<ReturnType<typeof setTimeout>|null>(null);
+ const count=assets.length,current=index%Math.max(count,1);
+ useEffect(()=>{const q=window.matchMedia('(prefers-reduced-motion: reduce)');const change=()=>setReduced(q.matches);change();q.addEventListener('change',change);const visibility=()=>setHidden(document.hidden);visibility();document.addEventListener('visibilitychange',visibility);const observer=new IntersectionObserver(([entry])=>setVisible(entry.isIntersecting),{threshold:.15});if(root.current)observer.observe(root.current);return()=>{observer.disconnect();q.removeEventListener('change',change);document.removeEventListener('visibilitychange',visibility);if(resume.current)clearTimeout(resume.current);};},[]);
+ useEffect(()=>{if(count<2||paused||!visible||reduced||hidden)return;const timer=window.setInterval(()=>setIndex(i=>(i+1)%count),compact?6500:5500);return()=>window.clearInterval(timer);},[count,paused,visible,reduced,hidden,compact]);
+ function interact(){if(count<2)return;setPaused(true);if(resume.current)clearTimeout(resume.current);resume.current=setTimeout(()=>{setPaused(false);resume.current=null;},30000);}
+ function move(step:number){interact();setIndex(i=>(i+step+count)%count);}
+ if(!count)return null;
+ return <div ref={root} className={`image-carousel ${compact?'carousel-compact':''} ${className}`} role="region" aria-roledescription="عارض صور" aria-label={label} onPointerDown={e=>{pointer.current={x:e.clientX,y:e.clientY};swiped.current=false;interact();}} onPointerMove={e=>{interact();if(pointer.current&&Math.abs(e.clientX-pointer.current.x)>45&&Math.abs(e.clientX-pointer.current.x)>Math.abs(e.clientY-pointer.current.y))swiped.current=true;}} onPointerUp={e=>{if(pointer.current&&swiped.current)move(e.clientX>pointer.current.x?1:-1);pointer.current=null;}} onPointerCancel={()=>{pointer.current=null;swiped.current=false;interact();}} onClickCapture={e=>{if(swiped.current){e.preventDefault();e.stopPropagation();swiped.current=false;}}} onFocusCapture={interact} onKeyDown={e=>{interact();if(e.key==='ArrowLeft'){e.preventDefault();move(1);}if(e.key==='ArrowRight'){e.preventDefault();move(-1);}}}>
+  <div className="carousel-slides">{assets.map((asset,i)=>{const photo=photos[asset];return photo?.frame?<svg key={asset} className={i===current?'is-current':''} viewBox={photo.frame.viewBox} preserveAspectRatio="xMidYMid slice" role="img" aria-label={`${label}، صورة ${i+1}`} aria-hidden={i!==current}><image href={photo.local} width={photo.frame.width} height={photo.frame.height}/></svg>:<img key={asset} draggable={false} src={photo?.local||`/api/media/${asset}`} alt={`${label}، صورة ${i+1}`} className={i===current?'is-current':''} aria-hidden={i!==current} loading={eager&&i===0?'eager':'lazy'} fetchPriority={eager&&i===0?'high':'auto'} onError={e=>{if(photo?.url&&e.currentTarget.src!==photo.url)e.currentTarget.src=photo.url;}}/>;})}</div>
+  {onOpen&&<button className="carousel-open" onClick={onOpen} aria-label={`شوف تفاصيل ${label}`}/>}
+  {count>1&&<div className="carousel-controls" dir="ltr"><button aria-label={`الصورة السابقة: ${label}`} onClick={()=>move(-1)}><ArrowLeft size={compact?13:18}/></button><span className="carousel-count" aria-live={paused?'polite':'off'}>{current+1} / {count}</span><button aria-label={`الصورة التالية: ${label}`} onClick={()=>move(1)}><ArrowRight size={compact?13:18}/></button></div>}
+ </div>;
+}

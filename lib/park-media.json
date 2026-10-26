@@ -1,0 +1,566 @@
+{
+  "adrena-line": {
+    "url": "https://s7g10.scene7.com/is/image/qic/Adrenaline%20hero?fmt=webp-alpha&wid=1800&qlt=90",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/rides/adrena-line",
+    "local": "/media/park/adrena-line.webp",
+    "frame": {
+      "width": 1800,
+      "height": 700,
+      "viewBox": "180 0 1440 700"
+    }
+  },
+  "adventure-junction": {
+    "url": "https://s7g10.scene7.com/is/image/qic/Adventure_Junction_Hero?fmt=webp-alpha&wid=1800&qlt=90",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/rides/adventure-junction",
+    "local": "/media/park/adventure-junction.webp"
+  },
+  "amirat-al-buhayra": {
+    "url": "https://s7g10.scene7.com/is/image/qic/Amirat%20albuhayra%20hero?fmt=webp-alpha&wid=1800&qlt=90",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/rides/amirat-al-buhayra",
+    "local": "/media/park/amirat-al-buhayra.webp",
+    "frame": {
+      "width": 1800,
+      "height": 700,
+      "viewBox": "180 0 1440 700"
+    }
+  },
+  "aquatopia": {
+    "url": "https://s7g10.scene7.com/is/image/qic/Aquatopia%20hero?fmt=webp-alpha&wid=1800&qlt=90",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/rides/aquatopia",
+    "local": "/media/park/aquatopia.webp",
+    "frame": {
+      "width": 1800,
+      "height": 700,
+      "viewBox": "180 0 1440 700"
+    }
+  },
+  "arabian-carousel": {
+    "url": "https://s7g10.scene7.com/is/image/qic/Arabian%20carousel%20hero?fmt=webp-alpha&wid=1800&qlt=90",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/rides/arabian-carousel",
+    "local": "/media/park/arabian-carousel.webp",
+    "frame": {
+      "width": 1800,
+      "height": 700,
+      "viewBox": "180 0 1440 700"
+    }
+  },
+  "big-splash": {
+    "url": "https://s7g10.scene7.com/is/image/qic/Big%20Splash%20hero?fmt=webp-alpha&wid=1800&qlt=90",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/rides/big-splash",
+    "local": "/media/park/big-splash.webp",
+    "frame": {
+      "width": 1800,
+      "height": 700,
+      "viewBox": "180 0 1440 700"
+    }
+  },
+  "canyon-charters": {
+    "url": "https://s7g10.scene7.com/is/image/qic/Canyon%20charters%20hero?fmt=webp-alpha&wid=1800&qlt=90",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/rides/canyon-charters",
+    "local": "/media/park/canyon-charters.webp",
+    "frame": {
+      "width": 1800,
+      "height": 700,
+      "viewBox": "180 0 1440 700"
+    }
+  },
+  "citadel-thrills-and-skills-land": {
+    "url": "https://s7g10.scene7.com/is/image/qic/citadel_logoEnglish?fmt=webp-alpha&wid=1800&qlt=90",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/rides/citadel-thrills-and-skills-land",
+    "local": "/media/park/citadel-thrills-and-skills-land.webp",
+    "frame": {
+      "width": 1800,
+      "height": 338,
+      "viewBox": "439 0 923 337"
+    }
+  },
+  "colossus": {
+    "url": "https://s7g10.scene7.com/is/image/qic/Colossus%20hero?fmt=webp-alpha&wid=1800&qlt=90",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/rides/colossus",
+    "local": "/media/park/colossus.webp",
+    "frame": {
+      "width": 1800,
+      "height": 700,
+      "viewBox": "180 0 1440 700"
+    }
+  },
+  "expo-flyer": {
+    "url": "https://s7g10.scene7.com/is/image/qic/Expo%20flyer%20hero?fmt=webp-alpha&wid=1800&qlt=90",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/rides/expo-flyer",
+    "local": "/media/park/expo-flyer.webp",
+    "frame": {
+      "width": 1800,
+      "height": 700,
+      "viewBox": "180 0 1440 700"
+    }
+  },
+  "falcons-flight": {
+    "url": "https://s7g10.scene7.com/is/image/qic/Falcons%20Flight%20Hero?fmt=webp-alpha&wid=1800&qlt=90",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/rides/falcons-flight",
+    "local": "/media/park/falcons-flight.webp",
+    "frame": {
+      "width": 1800,
+      "height": 700,
+      "viewBox": "180 0 1440 700"
+    }
+  },
+  "grand-exposition-carnival-games": {
+    "url": "https://s7g10.scene7.com/is/image/qic/Grand%20exposition?fmt=webp-alpha&wid=1800&qlt=90",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/rides/grand-exposition-carnival-games",
+    "local": "/media/park/grand-exposition-carnival-games.webp"
+  },
+  "gyrospin": {
+    "url": "https://s7g10.scene7.com/is/image/qic/Gyrospin%20Hero?fmt=webp-alpha&wid=1800&qlt=90",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/rides/gyrospin",
+    "local": "/media/park/gyrospin.webp",
+    "frame": {
+      "width": 1800,
+      "height": 700,
+      "viewBox": "180 0 1440 700"
+    }
+  },
+  "into-the-deep": {
+    "url": "https://s7g10.scene7.com/is/image/qic/Into%20The%20Deep?fmt=webp-alpha&wid=1800&qlt=90",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/rides/into-the-deep",
+    "local": "/media/park/into-the-deep.webp",
+    "frame": {
+      "width": 1800,
+      "height": 544,
+      "viewBox": "412 0 976 544"
+    }
+  },
+  "iron-rattler": {
+    "url": "https://s7g10.scene7.com/is/image/qic/Iron%20Rattler%20Hero?fmt=webp-alpha&wid=1800&qlt=90",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/rides/iron-rattler",
+    "local": "/media/park/iron-rattler.webp",
+    "frame": {
+      "width": 1800,
+      "height": 700,
+      "viewBox": "180 0 1440 700"
+    }
+  },
+  "kaleidoscope-balloons": {
+    "url": "https://s7g10.scene7.com/is/image/qic/Kaleidoscopbe%20balloons%20hero?fmt=webp-alpha&wid=1800&qlt=90",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/rides/kaleidoscope-balloons",
+    "local": "/media/park/kaleidoscope-balloons.webp",
+    "frame": {
+      "width": 1800,
+      "height": 700,
+      "viewBox": "180 0 1440 700"
+    }
+  },
+  "roundabout": {
+    "url": "https://s7g10.scene7.com/is/image/qic/Roundabout%20hero?fmt=webp-alpha&wid=1800&qlt=90",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/rides/roundabout",
+    "local": "/media/park/roundabout.webp",
+    "frame": {
+      "width": 1800,
+      "height": 700,
+      "viewBox": "180 0 1440 700"
+    }
+  },
+  "saw-mill-falls": {
+    "url": "https://s7g10.scene7.com/is/image/qic/Saw%20mills%20hero?fmt=webp-alpha&wid=1800&qlt=90",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/rides/saw-mill-falls",
+    "local": "/media/park/saw-mill-falls.webp",
+    "frame": {
+      "width": 1800,
+      "height": 700,
+      "viewBox": "180 0 1440 700"
+    }
+  },
+  "sea-stallion": {
+    "url": "https://s7g10.scene7.com/is/image/qic/Sea%20stallion%20hero?fmt=webp-alpha&wid=1800&qlt=90",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/rides/sea-stallion",
+    "local": "/media/park/sea-stallion.webp",
+    "frame": {
+      "width": 1800,
+      "height": 700,
+      "viewBox": "180 0 1440 700"
+    }
+  },
+  "sirocco-tower": {
+    "url": "https://s7g10.scene7.com/is/image/qic/Siricco%20Tower%20Hero?fmt=webp-alpha&wid=1800&qlt=90",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/rides/sirocco-tower",
+    "local": "/media/park/sirocco-tower.webp",
+    "frame": {
+      "width": 1800,
+      "height": 700,
+      "viewBox": "180 0 1440 700"
+    }
+  },
+  "skywatch": {
+    "url": "https://s7g10.scene7.com/is/image/qic/Skywatch%20hero?fmt=webp-alpha&wid=1800&qlt=90",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/rides/skywatch",
+    "local": "/media/park/skywatch.webp",
+    "frame": {
+      "width": 1800,
+      "height": 700,
+      "viewBox": "180 0 1440 700"
+    }
+  },
+  "spitfire": {
+    "url": "https://s7g10.scene7.com/is/image/qic/Spitfire%20Hero?fmt=webp-alpha&wid=1800&qlt=90",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/rides/spitfire",
+    "local": "/media/park/spitfire.webp",
+    "frame": {
+      "width": 1800,
+      "height": 700,
+      "viewBox": "180 0 1440 700"
+    }
+  },
+  "sprockenator": {
+    "url": "https://s7g10.scene7.com/is/image/qic/Sprockenator%20hero?fmt=webp-alpha&wid=1800&qlt=90",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/rides/sprockenator",
+    "local": "/media/park/sprockenator.webp",
+    "frame": {
+      "width": 1800,
+      "height": 700,
+      "viewBox": "180 0 1440 700"
+    }
+  },
+  "steam-town-carnival-games": {
+    "url": "https://s7g10.scene7.com/is/image/qic/SF_DummyLand_hero_1x?fmt=webp-alpha&wid=1800&qlt=90",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/rides/steam-town-carnival-games",
+    "local": "/media/park/steam-town-carnival-games.webp"
+  },
+  "steel-stampede": {
+    "url": "https://s7g10.scene7.com/is/image/qic/Steel%20stampede%20hero?fmt=webp-alpha&wid=1800&qlt=90",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/rides/steel-stampede",
+    "local": "/media/park/steel-stampede.webp",
+    "frame": {
+      "width": 1800,
+      "height": 700,
+      "viewBox": "180 0 1440 700"
+    }
+  },
+  "the-enchanted-greenhouse": {
+    "url": "https://s7g10.scene7.com/is/image/qic/The%20enchanted%20garden%20hero?fmt=webp-alpha&wid=1800&qlt=90",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/rides/the-enchanted-greenhouse",
+    "local": "/media/park/the-enchanted-greenhouse.webp",
+    "frame": {
+      "width": 1800,
+      "height": 700,
+      "viewBox": "180 0 1440 700"
+    }
+  },
+  "treasure-trail": {
+    "url": "https://s7g10.scene7.com/is/image/qic/Treasure%20trail%20hero?fmt=webp-alpha&wid=1800&qlt=90",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/rides/treasure-trail",
+    "local": "/media/park/treasure-trail.webp",
+    "frame": {
+      "width": 1800,
+      "height": 700,
+      "viewBox": "180 0 1440 700"
+    }
+  },
+  "twilight-express": {
+    "url": "https://s7g10.scene7.com/is/image/qic/Twilight%20xpress%20hero?fmt=webp-alpha&wid=1800&qlt=90",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/rides/twilight-express",
+    "local": "/media/park/twilight-express.webp",
+    "frame": {
+      "width": 1800,
+      "height": 700,
+      "viewBox": "180 0 1440 700"
+    }
+  },
+  "twilight-gardens-carnival-games": {
+    "url": "https://s7g10.scene7.com/is/image/qic/land?fmt=webp-alpha&wid=1800&qlt=90",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/rides/twilight-gardens-carnival-games",
+    "local": "/media/park/twilight-gardens-carnival-games.webp"
+  },
+  "water-wheel": {
+    "url": "https://s7g10.scene7.com/is/image/qic/Water%20wheel%20hero?fmt=webp-alpha&wid=1800&qlt=90",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/rides/water-wheel",
+    "local": "/media/park/water-wheel.webp",
+    "frame": {
+      "width": 1800,
+      "height": 700,
+      "viewBox": "180 0 1440 700"
+    }
+  },
+  "windrider": {
+    "url": "https://s7g10.scene7.com/is/image/qic/Windrider%20Hero?fmt=webp-alpha&wid=1800&qlt=90",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/rides/windrider",
+    "local": "/media/park/windrider.webp",
+    "frame": {
+      "width": 1800,
+      "height": 700,
+      "viewBox": "180 0 1440 700"
+    }
+  },
+  "zoomaflooma": {
+    "url": "https://s7g10.scene7.com/is/image/qic/Zoomaflooma%20hero?fmt=webp-alpha&wid=1800&qlt=90",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/rides/zoomaflooma",
+    "local": "/media/park/zoomaflooma.webp",
+    "frame": {
+      "width": 1800,
+      "height": 700,
+      "viewBox": "180 0 1440 700"
+    }
+  },
+  "chicken-sweets": {
+    "url": "https://s7g10.scene7.com/is/image/qic/chicken_sweets_hero?fmt=webp-alpha&wid=1000&qlt=85",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/restaurants/chicken-sweets",
+    "local": "/media/park/chicken-sweets.webp"
+  },
+  "citadel-snacks": {
+    "url": "https://s7g10.scene7.com/is/image/qic/Citadel%20Snacks-%20Desktop?fmt=webp-alpha&wid=1000&qlt=85",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/restaurants/citadel-snacks",
+    "local": "/media/park/citadel-snacks.webp",
+    "frame": {
+      "width": 1000,
+      "height": 768,
+      "viewBox": "116 0 768 768"
+    }
+  },
+  "coffee-treats": {
+    "url": "https://s7g10.scene7.com/is/image/qic/coffee_treats_2880x1440?fmt=webp-alpha&wid=1000&qlt=85",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/restaurants/coffee-treats",
+    "local": "/media/park/coffee-treats.webp"
+  },
+  "firepit-bbq": {
+    "url": "https://s7g10.scene7.com/is/image/qic/firepit_bbq_2880x1440?fmt=webp-alpha&wid=1000&qlt=85",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/restaurants/firepit-bbq",
+    "local": "/media/park/firepit-bbq.webp"
+  },
+  "fish-chippery": {
+    "url": "https://s7g10.scene7.com/is/image/qic/DSC04260-5?fmt=webp-alpha&wid=1000&qlt=85",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/restaurants/fish-chippery",
+    "local": "/media/park/fish-chippery.webp"
+  },
+  "fortune-fresh": {
+    "url": "https://s7g10.scene7.com/is/image/qic/Fortune%20Fresh%20-%20Desktop?fmt=webp-alpha&wid=1000&qlt=85",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/restaurants/fortune-fresh",
+    "local": "/media/park/fortune-fresh.webp",
+    "frame": {
+      "width": 1000,
+      "height": 768,
+      "viewBox": "116 0 768 768"
+    }
+  },
+  "garden-tacos": {
+    "url": "https://s7g10.scene7.com/is/image/qic/DSC04458-5?fmt=webp-alpha&wid=1000&qlt=85",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/restaurants/garden-tacos",
+    "local": "/media/park/garden-tacos.webp"
+  },
+  "gearworks-eatery": {
+    "url": "https://s7g10.scene7.com/is/image/qic/DSC04396-5?fmt=webp-alpha&wid=1000&qlt=85",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/restaurants/gearworks-eatery",
+    "local": "/media/park/gearworks-eatery.webp"
+  },
+  "high-octane-wings": {
+    "url": "https://s7g10.scene7.com/is/image/qic/high_octane_wings_2880x1440?fmt=webp-alpha&wid=1000&qlt=85",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/restaurants/high-octane-wings",
+    "local": "/media/park/high-octane-wings.webp"
+  },
+  "hot-dogs": {
+    "url": "https://s7g10.scene7.com/is/image/qic/hot_dogs_2880x1440?fmt=webp-alpha&wid=1000&qlt=85",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/restaurants/hot-dogs",
+    "local": "/media/park/hot-dogs.webp"
+  },
+  "indian-spice-cafe": {
+    "url": "https://s7g10.scene7.com/is/image/qic/indian_spice_cafe_2880x1440?fmt=webp-alpha&wid=1000&qlt=85",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/restaurants/indian-spice-cafe",
+    "local": "/media/park/indian-spice-cafe.webp"
+  },
+  "navigators-club": {
+    "url": "https://s7g10.scene7.com/is/image/qic/navigators_club_2880x1440?fmt=webp-alpha&wid=1000&qlt=85",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/restaurants/navigators-club",
+    "local": "/media/park/navigators-club.webp"
+  },
+  "navigators-restaurant": {
+    "url": "https://s7g10.scene7.com/is/image/qic/navigators_restaurant_2880x1440?fmt=webp-alpha&wid=1000&qlt=85",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/restaurants/navigators-restaurant",
+    "local": "/media/park/navigators-restaurant.webp"
+  },
+  "oasis-refreshments": {
+    "url": "https://s7g10.scene7.com/is/image/qic/oasis_refreshments_2880x1440?fmt=webp-alpha&wid=1000&qlt=85",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/restaurants/oasis-refreshments",
+    "local": "/media/park/oasis-refreshments.webp"
+  },
+  "popcorn": {
+    "url": "https://s7g10.scene7.com/is/image/qic/popcorn_2880x1440?fmt=webp-alpha&wid=1000&qlt=85",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/restaurants/popcorn",
+    "local": "/media/park/popcorn.webp"
+  },
+  "primos-pizzeria": {
+    "url": "https://s7g10.scene7.com/is/image/qic/DSC04348-5?fmt=webp-alpha&wid=1000&qlt=85",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/restaurants/primos-pizzeria",
+    "local": "/media/park/primos-pizzeria.webp"
+  },
+  "railway-refreshments": {
+    "url": "https://s7g10.scene7.com/is/image/qic/railway_refreshments_2880x1440?fmt=webp-alpha&wid=1000&qlt=85",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/restaurants/railway-refreshments",
+    "local": "/media/park/railway-refreshments.webp"
+  },
+  "roasters": {
+    "url": "https://s7g10.scene7.com/is/image/qic/roasters_?fmt=webp-alpha&wid=1000&qlt=85",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/restaurants/roasters",
+    "local": "/media/park/roasters.webp"
+  },
+  "samosas-karak": {
+    "url": "https://s7g10.scene7.com/is/image/qic/samosas_karak_2880x1440?fmt=webp-alpha&wid=1000&qlt=85",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/restaurants/samosas-karak",
+    "local": "/media/park/samosas-karak.webp"
+  },
+  "snack-shack": {
+    "url": "https://s7g10.scene7.com/is/image/qic/hero_snack_shack?fmt=webp-alpha&wid=1000&qlt=85",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/restaurants/snack-shack",
+    "local": "/media/park/snack-shack.webp"
+  },
+  "snack-station": {
+    "url": "https://s7g10.scene7.com/is/image/qic/hero_snack_station?fmt=webp-alpha&wid=1000&qlt=85",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/restaurants/snack-station",
+    "local": "/media/park/snack-station.webp"
+  },
+  "steam-town-grill": {
+    "url": "https://s7g10.scene7.com/is/image/qic/steam_town_grill_2880x1440?fmt=webp-alpha&wid=1000&qlt=85",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/restaurants/steam-town-grill",
+    "local": "/media/park/steam-town-grill.webp"
+  },
+  "taste-of-asia": {
+    "url": "https://s7g10.scene7.com/is/image/qic/taste_of_asia_2880x1440?fmt=webp-alpha&wid=1000&qlt=85",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/restaurants/taste-of-asia",
+    "local": "/media/park/taste-of-asia.webp"
+  },
+  "travelers-cafe": {
+    "url": "https://s7g10.scene7.com/is/image/qic/travelers_cafe_2880x1440?fmt=webp-alpha&wid=1000&qlt=85",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/restaurants/travelers-cafe",
+    "local": "/media/park/travelers-cafe.webp"
+  },
+  "twilight-cafe": {
+    "url": "https://s7g10.scene7.com/is/image/qic/twilight_cafe_2880x1440?fmt=webp-alpha&wid=1000&qlt=85",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/restaurants/twilight-cafe",
+    "local": "/media/park/twilight-cafe.webp"
+  },
+  "twilight-treats": {
+    "url": "https://s7g10.scene7.com/is/image/qic/twilight_treats_2880x1440?fmt=webp-alpha&wid=1000&qlt=85",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/restaurants/twilight-treats",
+    "local": "/media/park/twilight-treats.webp"
+  },
+  "valley-canteen": {
+    "url": "https://s7g10.scene7.com/is/image/qic/DSC04196-5?fmt=webp-alpha&wid=1000&qlt=85",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/restaurants/valley-canteen",
+    "local": "/media/park/valley-canteen.webp"
+  },
+  "valley-grill": {
+    "url": "https://s7g10.scene7.com/is/image/qic/valley_grill_2880x1440?fmt=webp-alpha&wid=1000&qlt=85",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/restaurants/valley-grill",
+    "local": "/media/park/valley-grill.webp"
+  },
+  "waha-cafe": {
+    "url": "https://s7g10.scene7.com/is/image/qic/waha_cafe_2880x1440?fmt=webp-alpha&wid=1000&qlt=85",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/restaurants/waha-cafe",
+    "local": "/media/park/waha-cafe.webp"
+  },
+  "primo-s-pizzeria": {
+    "url": "https://s7g10.scene7.com/is/image/qic/DSC04348-5?fmt=webp-alpha&wid=1000&qlt=85",
+    "credit": "Six Flags Qiddiya City",
+    "source": "https://sixflagsqiddiyacity.com/en/explore/restaurants/primos-pizzeria",
+    "local": "/media/park/primos-pizzeria.webp"
+  },
+  "spitfire-track": {
+    "url": "https://rcdb.com/aaiulng",
+    "credit": "RCDB",
+    "source": "https://rcdb.com/21313.htm",
+    "local": "/media/park/spitfire-track.jpg"
+  },
+  "sirocco-tower-entrance": {
+    "url": "https://pbs.twimg.com/media/HBi1IIEbUAI-o6F.jpg",
+    "credit": "Attractions 360°",
+    "source": "https://x.com/SoCal360/status/2024567187709861984",
+    "local": "/media/park/sirocco-tower-entrance.jpg"
+  },
+  "sea-stallion-aerial": {
+    "url": "https://rcdb.com/aaicmma",
+    "credit": "RCDB",
+    "source": "https://rcdb.com/21308.htm",
+    "local": "/media/park/sea-stallion-aerial.jpg"
+  },
+  "falcons-flight-train": {
+    "url": "https://www.intamin.com/wp-content/uploads/2026/02/IAR_SoMe_Falcons100Procent_20263.jpg",
+    "credit": "Intamin",
+    "source": "https://www.intamin.com/project/falcons-flight/",
+    "local": "/media/park/falcons-flight-train.jpg"
+  },
+  "saw-mill-falls-track": {
+    "url": "https://rcdb.com/aaiupca",
+    "credit": "RCDB",
+    "source": "https://rcdb.com/21309.htm",
+    "local": "/media/park/saw-mill-falls-track.jpg"
+  },
+  "iron-rattler-drop": {
+    "url": "https://www.vekoma.com/public/files/images/News/Image%20%2848%29.jpg",
+    "credit": "Vekoma",
+    "source": "https://www.vekoma.com/news/worlds-tallest-tilt-coaster-opened-at-six-flags-qiddiya-city",
+    "local": "/media/park/iron-rattler-drop.jpg"
+  },
+  "iron-rattler-night": {
+    "url": "https://www.vekoma.com/public/files/images/News/DJI_20251018181240_0099_D_LR%281%29.jpg",
+    "credit": "Vekoma",
+    "source": "https://www.vekoma.com/news/worlds-tallest-tilt-coaster-opened-at-six-flags-qiddiya-city",
+    "local": "/media/park/iron-rattler-night.jpg"
+  }
+}
