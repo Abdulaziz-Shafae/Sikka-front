@@ -18,7 +18,8 @@
     "build:railway": "node scripts/railway-runtime.mjs build",
     "start:railway": "node scripts/railway-runtime.mjs start",
     "check:integration": "node scripts/checks/integration-contract.cjs",
-    "check:production": "node scripts/checks/production-http.cjs"
+    "check:production": "node scripts/checks/production-http.cjs",
+    "check:live": "node scripts/checks/live-flow.cjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",

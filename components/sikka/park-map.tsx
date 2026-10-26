@@ -25,7 +25,7 @@ const mapPositions = mapItems.map(m=>{const n=parkGraph.nodes.find(n=>n.id===m.n
 const mapFitPoints = mapPositions.map(({x,y})=>({x,y}));
 const layerKinds: Record<Layer, string> = { rides: 'RIDE', places: 'RESTAURANT', prayer: 'PRAYER_ROOM', restrooms: 'RESTROOM' };
 const layers = [{ id: 'rides' as Layer, name: 'الألعاب', icon: MapPin }, { id: 'places' as Layer, name: 'المطاعم', icon: UtensilsCrossed }, { id: 'prayer' as Layer, name: 'المصليات', icon: MoonStar }, { id: 'restrooms' as Layer, name: 'دورات المياه', icon: Toilet }];
-export function ParkMap({ compact = false, onRide, itinerary=[],focusedKey,onActivity }: { itinerary?:{key:string;activityKey?:string;title:string;completed:boolean;participants?:string[];start?:number;end?:number}[]; focusedKey?:string;onActivity?:(key:string)=>void;compact?: boolean; onRide: (s: string) => void; onPlan?: () => void }) {
+export function ParkMap({ compact = false, onRide, itinerary=[],focusedKey,onActivity,serverRoutes=[],useServerRoutes=false }: { serverRoutes?:number[][][];useServerRoutes?:boolean;itinerary?:{key:string;activityKey?:string;title:string;completed:boolean;participants?:string[];start?:number;end?:number}[]; focusedKey?:string;onActivity?:(key:string)=>void;compact?: boolean; onRide: (s: string) => void; onPlan?: () => void }) {
   const [foodFilters,setFoodFilters]=useState<string[]>([]),[restaurants,setRestaurants]=useState<Restaurant[]>([]),[foodError,setFoodError]=useState('');
 
   const terrainId = useId().replace(/:/g, '');
@@ -78,7 +78,7 @@ export function ParkMap({ compact = false, onRide, itinerary=[],focusedKey,onAct
     <div className="map-gesture-guide"><MousePointer2Icon/>اسحب للتحريك، وقرّب بأصبعين أو بالتتش باد<span>بالكيبورد: + و − للتقريب · 0 للتوسيط</span></div>
     <div className="map-viewport" ref={map.viewportRef} tabIndex={0} role="group" aria-label="خريطة المنتزه التفاعلية. اسحب للتحريك، قرّب بأصبعين أو استخدم زائد وناقص من لوحة المفاتيح" {...map.handlers}>
       <div className="map-surface" style={{transform:`translate(${map.view.x}px,${map.view.y}px) scale(${map.view.scale})`,opacity:map.size.width?1:0}}>
-        {itineraryRoutes.length>0&&<svg className="readiness-plan-paths" width="6500" height="4035" aria-hidden="true">{itineraryRoutes.flatMap((r,i)=>r!.paths.map((path,j)=><polyline key={`${i}-${j}`} points={path.map(p=>p.join(',')).join(' ')} fill="none" stroke="#e84958" strokeWidth="13" strokeLinecap="round" strokeLinejoin="round"/>))}</svg>}
+        {(useServerRoutes?serverRoutes.length:itineraryRoutes.length)>0&&<svg className="readiness-plan-paths" width="6500" height="4035" aria-hidden="true">{(useServerRoutes?serverRoutes:itineraryRoutes.flatMap(r=>r!.paths)).map((path,i)=><polyline key={i} points={path.filter(p=>p.length===2&&p.every(Number.isFinite)).map(p=>p.join(',')).join(' ')} fill="none" stroke="#e84958" strokeWidth="13" strokeLinecap="round" strokeLinejoin="round"/>)}</svg>}
         {/* Tile only empty soil from the source image; rides and routes stay untouched. */}
         <svg className="map-terrain" width="6500" height="4035" aria-hidden="true">
           <defs>

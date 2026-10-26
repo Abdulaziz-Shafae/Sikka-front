@@ -1,6 +1,6 @@
 import {apiRequest} from './api-client';
 export type PaymentOrder={id:number;amountSar:number;status:'PENDING'|'PAID'|'FAILED';moyasarPaymentId:string|null;verifiedAt:string|null;failureReason:string|null};
-export type PlanningPreview={readyToGenerate:boolean;paymentRequired:boolean;freeRemaining:number;priceSar:number;entitlementStatus:string;missingFields:string[];warnings:string[]};
+export type PlanningPreview={members?:{visitMemberId:number;name:string;answerStatus:string;missingFields:string[];warnings:string[]}[];readyToGenerate:boolean;paymentRequired:boolean;freeRemaining:number;priceSar:number;entitlementStatus:string;missingFields:string[];warnings:string[]};
 export function serverId(value:number|string){const n=Number(value);if(!Number.isSafeInteger(n)||n<=0)throw new Error('افتح الدفع من زيارة محفوظة في حسابك');return n;}
 export function parseOrder(raw:unknown):PaymentOrder{
  if(!raw||typeof raw!=='object')throw new Error('تعذر قراءة طلب الدفع');const o=raw as PaymentOrder;
