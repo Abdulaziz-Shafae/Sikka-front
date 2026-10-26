@@ -1,3 +1,4 @@
+import type {RidePriority,UiPlan} from './planning-ui';
 import {type FoodPreferences} from './food-flow';
 import catalogue from './park-catalogue.json';
 import graph from './park-routes.json';
@@ -17,7 +18,7 @@ export const parkGraph=graph;
 export const categoryName:Record<string,string>={THRILL:'حماس عالي',FAMILY:'مع العائلة',KIDS:'للصغار',ARCADE:'ألعاب كرنفال',WATER:'مغامرة مائية'};
 export const meals=[{name:'Gearworks Eatery',land:'ستيم تاون',type:'مطعم',style:'meal-orange'},{name:"Primo’s Pizzeria",land:'مدينة التشويق',type:'بيتزا',style:'meal-red'},{name:'Coffee & Treats',land:'ينابيع الاكتشاف',type:'قهوة وسناك',style:'meal-blue'}];
 export const initialVisit={id:'demo',name:'طلعة الشباب',type:'FRIENDS',date:'2026-10-31',duration:240,arrival:'16:00',together:'SPLIT',goal:'ألعاب أكثر',prayer:true,meal:'وجبة وسناك',restaurant:'Gearworks Eatery',members:['عبدالعزيز','محمد','نواف'],selected:['iron-rattler','sirocco-tower'],status:'DRAFT',paid:false,approved:false,completed:[] as string[],ratings:{} as Record<string,number>};
-export type Visit=typeof initialVisit & {food?:FoodPreferences};
+export type Visit=typeof initialVisit & {food?:FoodPreferences;ridePriorities?:Record<string,RidePriority>;dislikedFeatures?:string[];memberDislikedFeatures?:Record<string,string[]>;memberSelections?:Record<string,{slug:string;priority:RidePriority}[]>;rsvps?:Record<string,'GOING'|'MAYBE'|'NOT_GOING'|'INVITED'>;planning?:UiPlan;skipped?:string[];review?:{visit:number;system:number;note:string};delayResponses?:{member:string;reason:string;adjustPlan:boolean;at:string}[];paymentState?:'PENDING'|'FAILED'|'PAID'};
 export function makeActivities(v:Visit){
   if(v.food){
     const breaks=v.food.breaks;
