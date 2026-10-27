@@ -142,3 +142,5 @@ body{background:#f7f8fb}
 .invitation-code{display:flex;align-items:center;flex-wrap:wrap;gap:14px;padding:18px;border:1px solid #d7e8ff;border-radius:14px;background:#eff7ff;margin-block:18px}.invitation-code code{font:700 24px Arial;letter-spacing:3px;direction:ltr;user-select:all}
 
 [data-sonner-toaster]{width:min(620px,calc(100vw - 32px))!important}[data-sonner-toast].sikka-toast{width:100%!important}
+
+.plan-activity-photo{height:170px;overflow:hidden;border-radius:14px;margin-bottom:16px}.plan-activity-photo .image-carousel{height:100%}.map-pin.next-station{box-shadow:0 0 0 8px #42a5ff40,0 0 24px 10px #42a5ff80;z-index:10}

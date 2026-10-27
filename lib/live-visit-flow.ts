@@ -12,3 +12,5 @@ export function rideAvailabilityLabel(ride:{status:string;availabilitySource?:st
 
 export function hasPlanningProfile(profile:{birthDate:string|null;heightCm:number|null;weightKg:number|null;thrillPreference:string|null}|null){return !!profile?.birthDate&&Number(profile.heightCm)>0&&Number(profile.weightKg)>0&&!!profile.thrillPreference;}
 export function extractInviteCode(message:string){return message.match(/invite code:\s*([A-Za-z0-9]+)/i)?.[1]||'';}
+
+export function formatPlanOffset(minutes:number){return `${String(Math.floor(minutes/60)).padStart(2,'0')}:${String(minutes%60).padStart(2,'0')}`;}
