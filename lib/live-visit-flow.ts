@@ -9,3 +9,6 @@ export function rideAvailabilityLabel(ride:{status:string;availabilitySource?:st
  if(ride.availabilitySource==='QUEUE_ANALYTICS_LIVE'){const raw=ride.waitObservedAt||'';const observed=Date.parse(/(?:Z|[+-]\d{2}:\d{2})$/.test(raw)?raw:raw+'+03:00');if(!Number.isFinite(observed)||Date.now()-observed>600000||observed>Date.now()+30000)return 'متاحة للاختيار — حالة التشغيل قديمة';}
  return ride.status==='OPEN'?'مفتوحة':ride.status==='CLOSED'?'مغلقة':ride.availabilitySource==='ADMIN'?'غير متاحة':'متاحة للاختيار — التشغيل غير مؤكد';
 }
+
+export function hasPlanningProfile(profile:{birthDate:string|null;heightCm:number|null;weightKg:number|null;thrillPreference:string|null}|null){return !!profile?.birthDate&&Number(profile.heightCm)>0&&Number(profile.weightKg)>0&&!!profile.thrillPreference;}
+export function extractInviteCode(message:string){return message.match(/invite code:\s*([A-Za-z0-9]+)/i)?.[1]||'';}

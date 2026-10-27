@@ -1,0 +1,21 @@
+const messages:Record<string,string>={
+ 'Invalid email or password':'البريد الإلكتروني أو كلمة المرور غير صحيحة.',
+ 'Login required':'سجّل دخولك لإكمال الطلب.',
+ 'Access denied':'ما عندك صلاحية لتنفيذ هذا الطلب.',
+ 'verify your account first':'فعّل بريدك أولًا قبل إنشاء الزيارة.',
+ 'email already exists':'هذا البريد مسجّل من قبل؛ سجّل دخولك أو اطلب رمز تفعيل جديدًا.',
+ 'invalid or expired code':'رمز التفعيل غير صحيح أو انتهت صلاحيته؛ اطلب رمزًا جديدًا.',
+ 'members can only be changed while the visit is in DRAFT':'تعديل المشاركين واختياراتهم متاح للزيارة المسودة فقط. استخدم مقترح تعديل إذا كانت الخطة معتمدة.',
+ 'family count is required for FAMILY trip':'حدد عدد أفراد العائلة قبل حفظ الزيارة.',
+ 'Only the visit organizer can preview planning details':'مراجعة جاهزية التخطيط متاحة للمنظّم فقط. تقدر تؤكد حضورك وتحفظ اختياراتك من الزيارة.',
+ 'You cannot edit this participant\'s planning answers':'تقدر تعدّل اختياراتك أنت فقط؛ اختَر اسمك من المشاركين.',
+ 'No schedule change is needed; the current plan remains unchanged':'الجدول الحالي مناسب ولا يحتاج تعديلًا.',
+ 'The activity has not reached its scheduled start time':'وقت النشاط ما بدأ بعد؛ انتظر الموعد المحدد.',
+ 'Visit not found':'الزيارة غير موجودة أو لم تعد متاحة.',
+ 'visit not found':'الزيارة غير موجودة أو لم تعد متاحة.',
+ 'Select the restaurant on the visit date before the food break starts':'اختيار المطعم يتاح يوم الزيارة قبل بدء بريك الأكل.',
+ 'Choose an open restaurant':'اختر مطعمًا متاحًا للتخطيط.',
+ 'Failed to fetch':'تعذر الاتصال بالخادم. تحقق من اتصالك وحاول مرة ثانية.',
+ 'NetworkError when attempting to fetch resource.':'تعذر الاتصال بالخادم. تحقق من اتصالك وحاول مرة ثانية.',
+};
+export function arabicMessage(value:unknown){const text=value instanceof Error?value.message:String(value||'');if(messages[text])return messages[text];if(/height.*missing/i.test(text))return 'الطول غير مكتمل في الملف؛ أهلية بعض الألعاب تحتاج تأكيدًا.';if(/weight.*missing/i.test(text))return 'الوزن غير مكتمل في الملف؛ أهلية بعض الألعاب تحتاج تأكيدًا.';if(/birth date.*missing|age is unknown/i.test(text))return 'تاريخ الميلاد غير مكتمل؛ أضفه لتقييم الألعاب المناسبة للعمر.';if(/[\u0600-\u06ff]/.test(text)&&!/SQLException|Exception:|Hibernate/i.test(text))return text;return 'تعذر إكمال الطلب. راجع بياناتك وحاول مرة ثانية.';}

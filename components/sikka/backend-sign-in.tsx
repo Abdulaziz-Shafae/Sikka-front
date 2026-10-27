@@ -1,4 +1,5 @@
 'use client';
+import {FeedbackError} from './feedback';
 import {useState} from 'react';
 import {authenticate,apiConfigured,type CurrentAccount} from '@/lib/api-client';
 import {Button} from '@/components/ui/button';
@@ -9,7 +10,7 @@ export function BackendSignIn({onAuthenticated}:{onAuthenticated:(account:Curren
   <h2>سجّل دخولك لحساب سكة</h2><p>نتحقق من حسابك في سكة. تظل الجلسة محفوظة حتى تنتهي صلاحيتها أو تسجّل خروجك.</p>
   <label>البريد الإلكتروني<Input name="email" type="email" autoComplete="username" required disabled={busy}/></label>
   <label>كلمة المرور<Input name="password" type="password" autoComplete="current-password" required disabled={busy}/></label>
-  {error&&<p role="alert">{error}</p>}{!apiConfigured()&&<p role="alert">اتصال الخادم غير مضبوط بعد.</p>}
+  {error&&<FeedbackError message={error}/>}{!apiConfigured()&&<FeedbackError message="اتصال الخادم غير مضبوط بعد."/>}
   <Button disabled={busy||!apiConfigured()} type="submit">{busy?'نتحقق من حسابك…':'تسجيل الدخول'}</Button>
  </form>;
 }

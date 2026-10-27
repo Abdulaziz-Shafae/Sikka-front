@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Dialog,DialogContent,DialogHeader,DialogTitle,DialogDescription } from '@/components/ui/dialog';
 import { Sheet,SheetContent,SheetHeader,SheetTitle,SheetTrigger } from '@/components/ui/sheet';
 import { Switch } from '@/components/ui/switch';
-import {Toaster,toast} from 'sonner';
+import {toast} from 'sonner';
 import {getVisitSteps,getNextPageAfterVisitDetails} from '@/lib/visit-flow';
 import {VisitActions} from '@/components/sikka/visit-actions';
 import {NotificationInbox} from '@/components/sikka/notification-inbox';
@@ -118,5 +118,5 @@ return <MotionConfig reducedMotion="user"><div className="sikka-app">{isDemoMode
 {modal==='delay'&&<><Field label="سبب التأخير"><select value={delayReason} onChange={e=>setDelayReason(e.target.value)}>{['راحة','لعبة خارج الخطة','انتظار أطول','سبب آخر'].map(s=><option key={s}>{s}</option>)}</select></Field><Field label="التفاصيل"><textarea value={note} onChange={e=>setNote(e.target.value)} placeholder="وش صار وكم تحتاجون وقت؟"/></Field><Button onClick={()=>{setPendingReplan(true);setModal('replan')}}>راجع اقتراح التعديل<ArrowLeft size={17}/></Button></>}
 {modal==='replan'&&<><div className="comparison-grid"><div><small>الخطة الحالية</small><h3>{current?.title||'أنشطة الزيارة'}</h3><p>تظل كما هي إلى اعتمادك.</p></div><div><small>المقترح للعرض</small><h3>نراجع اختيارات الألعاب</h3><p>تقدر تبدّل نشاطًا وتبقي بقية الزيارة.</p></div></div><Button onClick={()=>{setModal(null);setPendingReplan(false);go('selection');toast.info('اختَر التغيير ثم ارجع للخطة. لا تعديل تلقائي على الأنشطة.')}}>راجع الاختيارات<ArrowLeft size={16}/></Button><Button variant="outline" onClick={()=>setModal(null)}>نخلي الخطة الحالية</Button></>}
 {modal==='delete'&&<><Button variant="destructive" onClick={()=>{localStorage.removeItem('sikka-demo-read');setVisits([]);setFavorites([]);setUser(null);setFamily([]);setActiveId('');setPrivacy({location:false,email:false,whatsapp:false,health:false});setModal(null);toast.success('مسحنا بيانات العرض المحلية');go('home')}}>امسح البيانات المحلية<Trash2 size={17}/></Button><Button variant="outline" onClick={()=>setModal(null)}>خلها محفوظة</Button></>}
-</DialogContent></Dialog><Toaster position="top-center" richColors dir="rtl"/></div></MotionConfig>;
+</DialogContent></Dialog></div></MotionConfig>;
 }

@@ -1,3 +1,4 @@
+import {paymentApi,type PlanningPreview} from './payment-api';
 import {apiRequest,SikkaApiError} from './api-client';
 import type {ApiPlanDetails,ApiPlanItem,GenerationResult} from './backend-contract';
 export type LiveVisit={id:number;name:string;visitDate:string;durationMinutes:number;maxParticipants:number;tripType:'SOLO'|'FRIENDS'|'FAMILY';togetherMode:'TOGETHER'|'SPLIT'|null;primaryGoal:string;includePrayer:boolean;status:'DRAFT'|'PLANNING'|'READY'|'IN_PROGRESS'|'COMPLETED'|'CANCELLED';membersLocked:boolean;organizerAccountId:number;plannedStartTime:string|null;expectedArrivalTime:string|null};
@@ -13,7 +14,7 @@ export type Consent={id:number;consentKind:string;granted:boolean;policyVersion:
 export type Notice={id:number;visitId:number;title:string;message:string;type:string;readAt:string|null;respondedAt:string|null;actionType:string|null};
 export type MapSegment={visitMemberId:number;toPlanItemId:number;available:boolean;estimated:boolean;route?:{points:number[][];distanceMeters:number};reason?:string};
 export type RouteData={segments:MapSegment[];planItems:ApiPlanItem[]};
-export type CreateVisit={name:string;groupName?:string;visitDate:string;durationMinutes:number;maxParticipants:number;tripType:string;togetherMode:string|null;primaryGoal:string;includePrayer:boolean;goals:string};
+export type CreateVisit={familyCount?:number;name:string;groupName?:string;visitDate:string;durationMinutes:number;maxParticipants:number;tripType:string;togetherMode:string|null;primaryGoal:string;includePrayer:boolean;goals:string};
 export const request=<T>(path:string,method='GET',body?:unknown)=>apiRequest('/api/v1/'+path,method,body) as Promise<T>;
 export const liveApi={
  rides:()=>request<LiveRide[]>('ride/get'),
@@ -66,3 +67,12 @@ export function mayEditMember(visit:LiveVisit,accountId:number,profileId:number,
 export function executionState(itemId:number,memberId:number,records:RecordRow[],sessions:Session[]){const record=records.find(r=>r.planItemId===itemId&&r.visitMemberId===memberId);const session=sessions.find(s=>s.planItemId===itemId&&s.visitMemberId===memberId);return {record,session,status:record?.status||session?.status||'UPCOMING'};}
 
 export async function fetchVisiblePlan(visit:LiveVisit,accountId:number,scope='default'){const leader=visit.organizerAccountId===accountId;if(scope==='mine'||!leader&&scope!=='group')return liveApi.ownPlan(visit.id);if(scope==='group'&&!leader)return liveApi.groupPlan(visit.id);const plans=await liveApi.plans(visit.id);const candidate=plans.filter(p=>p.planKind==='GROUP').sort((a,b)=>Number(b.isActive)-Number(a.isActive)||b.id-a.id)[0];if(!candidate)throw new Error('لم تتولد خطة لهذه الزيارة بعد');return liveApi.details(candidate.id);}
+
+export async function loadVisitSetup(visitId:number,accountId:number,profileId:number){
+ const [visit,summary,rides,places]=await Promise.all([liveApi.visit(visitId),liveApi.members(visitId),liveApi.rides(),liveApi.places()]);
+ const own=summary.members.find(member=>member.visitorProfileId===profileId);
+ let preview:PlanningPreview;
+ if(visit.organizerAccountId===accountId)preview=await paymentApi.preview(visitId);
+ else{const answers=own?await liveApi.preferences(own.id):null;preview={members:own&&answers?[{visitMemberId:own.id,name:own.name,answerStatus:answers.answerStatus,missingFields:[],warnings:[]}]:[],readyToGenerate:false,paymentRequired:false,freeRemaining:0,priceSar:0,entitlementStatus:'ORGANIZER_MANAGED',missingFields:[],warnings:[]};}
+ return {visit,members:summary.members,preview,rides,places};
+}

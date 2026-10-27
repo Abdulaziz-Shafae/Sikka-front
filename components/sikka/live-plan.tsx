@@ -1,4 +1,5 @@
 'use client';
+import {FeedbackError} from './feedback';
 import {useEffect,useState} from 'react';
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
@@ -47,7 +48,7 @@ export function LivePlan({details,visit,members,memberId,accountId,rides,places,
  const calendarVisit:Visit={...initialVisit,id:String(visit.id),name:visit.name,date:visit.visitDate,arrival:visit.expectedArrivalTime||visit.plannedStartTime||'',duration:visit.durationMinutes,members:members.map(m=>m.name)};
  return <section>{family&&<label className="field">سجل وتقييم المشارك<select value={viewerId} onChange={e=>setViewerId(Number(e.target.value))}>{members.filter(m=>m.id===memberId||m.visitorProfileId===null).map(m=><option key={m.id} value={m.id}>{m.name}</option>)}</select></label>}<div className="readiness-actions"><Button disabled={busy} variant="outline" onClick={()=>mutate(reload)}>حدّث الخطة والسجل</Button></div>
  {provisional&&<p className="inline-note" role="status">الخطة تقديرية: قد تتضمن ألعابًا غير مؤكدة التشغيل، وتُستخدم تقديرات الانتظار عند غياب قراءة حديثة. تأكد من التشغيل وشروط الركوب عند الزيارة.</p>}
- <p>{details.plan.planKind==='GROUP'?'خطة القروب':'الخطة الفردية'} · {details.approvalStatus==='APPROVED'?'معتمدة':details.approvalStatus==='REJECTED'?'مرفوضة':'بانتظار الاعتماد'}</p>{dataError&&<p role="alert">تعذر جلب السجل أو المسارات: {dataError}. لن نفترض اكتمال الأنشطة.</p>}
+ <p>{details.plan.planKind==='GROUP'?'خطة القروب':'الخطة الفردية'} · {details.approvalStatus==='APPROVED'?'معتمدة':details.approvalStatus==='REJECTED'?'مرفوضة':'بانتظار الاعتماد'}</p>{dataError&&<FeedbackError message={dataError}/>}
  {progress&&<div className="readiness-metrics"><span>الألعاب: {progress.completionPercentage}%</span><span>المتبقي: {progress.remainingActivitiesCount} نشاط</span><span>المتخطى: {progress.skippedActivitiesCount}</span></div>}
  {!proposal&&details.approvalStatus==='PENDING'&&leader&&<div className="readiness-actions"><Button disabled={busy} onClick={()=>mutate(async()=>{await backendApi.approve(details.plan.id);await reload();},'اعتمدت الخطة')}>اعتمد الخطة</Button><Button variant="outline" disabled={busy} onClick={()=>mutate(async()=>{await backendApi.reject(details.plan.id);await reload();},'تم رفض الخطة')}>ارفض الخطة</Button></div>}
  {!proposal&&!['APPROVED','PENDING','REJECTED'].includes(details.approvalStatus||'')&&leader&&<Button disabled={busy} onClick={()=>mutate(async()=>{await liveApi.createApproval(details.plan.id);await reload();},'طلب الاعتماد جاهز')}>جهز طلب الاعتماد</Button>}

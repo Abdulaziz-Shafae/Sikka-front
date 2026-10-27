@@ -133,3 +133,12 @@ body{background:#f7f8fb}
 
 /* Keep carousel navigation opposite the ride category badge at every viewport width. */
 .ride-cover .carousel-controls{right:auto;left:12px;bottom:12px}
+
+/* Shared feedback stays above dialogs and never consumes page space. */
+[data-sonner-toaster]{z-index:2147483647!important;font-family:inherit!important;max-width:calc(100vw - 32px)}
+[data-sonner-toast].sikka-toast{background:#eff7ff!important;color:#0878d8!important;border:1px solid #d7e8ff!important;border-radius:16px!important;box-shadow:0 6px 22px #15386718!important;padding:22px 26px!important;font-family:inherit!important;font-size:16px!important;line-height:1.8!important;text-align:right;gap:14px}
+[data-sonner-toast].sikka-toast [data-description]{color:inherit!important}
+[data-sonner-toast].sikka-toast [data-close-button]{background:#eff7ff!important;color:#0878d8!important;border-color:#d7e8ff!important}
+.invitation-code{display:flex;align-items:center;flex-wrap:wrap;gap:14px;padding:18px;border:1px solid #d7e8ff;border-radius:14px;background:#eff7ff;margin-block:18px}.invitation-code code{font:700 24px Arial;letter-spacing:3px;direction:ltr;user-select:all}
+
+[data-sonner-toaster]{width:min(620px,calc(100vw - 32px))!important}[data-sonner-toast].sikka-toast{width:100%!important}

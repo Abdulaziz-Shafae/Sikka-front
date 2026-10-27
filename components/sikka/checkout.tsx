@@ -1,4 +1,5 @@
 'use client';
+import {FeedbackError} from './feedback';
 import {useEffect,useRef,useState} from 'react';
 import {Button} from '@/components/ui/button';
 import {BackendSignIn} from './backend-sign-in';
@@ -40,6 +41,6 @@ export function Checkout({visitId,returning=false}:{visitId?:number;returning?:b
   {order&&<section className="readiness-panel"><h2>طلب رقم {order.id}</h2><p>{order.amountSar} ر.س · {order.status==='PAID'?'مدفوع':order.status==='FAILED'?'لم يكتمل الدفع':'بانتظار الدفع أو التحقق'}</p>{order.failureReason&&<p>{order.failureReason}</p>}</section>}
   {paid?<section className="readiness-panel" role="status"><h2>تم تأكيد الدفع من سكة</h2><p>ارجع لزياراتك وحدّث حالة التخطيط. لم نعلّم أي زيارة مدفوعة محليًا.</p><a href="/connect">افتح زياراتي</a></section>:returning?<section className="readiness-panel"><p>الرجوع من البنك وحده لا يؤكد نجاح الدفع؛ نراجع العملية مع سكة أولًا.</p><Button disabled={busy||!paymentId||!returnedOrder} onClick={confirm}>{busy?'نتحقق من العملية…':'تحقق من الدفع'}</Button>{(!paymentId||!returnedOrder)&&<p role="alert">رابط النتيجة ناقص. راجع طلباتك من حسابك قبل إعادة الدفع.</p>}</section>:<div className="readiness-actions"><Button disabled={busy||!preview?.paymentRequired||formReady} onClick={pay}>{busy?'نجهز الدفع…':order?.status==='PENDING'?'أكمل طلب الدفع':'ادفع بأمان'}</Button><Button variant="outline" disabled={busy} onClick={load}>تحديث حالة الطلب</Button></div>}
   <div ref={container} className="sikka-payment-form" hidden={!formReady||!authenticated}/>
- </>}{error&&<p className="readiness-panel" role="alert">{error}</p>}{process.env.NEXT_PUBLIC_MOYASAR_PUBLISHABLE_KEY?.startsWith('pk_test_')&&<p>بيئة دفع تجريبية.</p>}
+ </>}{error&&<FeedbackError message={error}/>}{process.env.NEXT_PUBLIC_MOYASAR_PUBLISHABLE_KEY?.startsWith('pk_test_')&&<p>بيئة دفع تجريبية.</p>}
  </main>;
 }

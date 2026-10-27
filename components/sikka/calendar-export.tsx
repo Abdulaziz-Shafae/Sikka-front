@@ -1,4 +1,5 @@
 'use client';
+import {FeedbackError} from './feedback';
 import {useState} from 'react';
 import {CalendarDays, ChevronLeft, ArrowRight, Download, ExternalLink, RefreshCw} from 'lucide-react';
 import {Button} from '@/components/ui/button';
@@ -94,7 +95,7 @@ export function CalendarExport({visit}:{visit:Visit}){
           <button type="button" disabled={loading||!scheduled} className="flex items-center gap-3 rounded-xl border p-4 text-right hover:bg-muted/50 disabled:opacity-50" onClick={apple}><Download size={22}/><span className="flex-1"><strong className="block">Apple Calendar</strong><small className="text-muted-foreground">حمّل ملف الزيارة بصيغة ICS</small></span><ChevronLeft size={18}/></button>
           <Button variant="ghost" disabled={loading||!scheduled} onClick={()=>setStep('choose')}> <ArrowRight size={16}/> رجوع </Button>
         </div>}
-        {!scheduled&&<p role="status">حدد وقت الوصول من الخطة أولًا؛ ما نفترض لك وقتًا.</p>}{failure&&<p role="alert">{failure}</p>}{isDemoMode&&<p className="text-xs text-muted-foreground">هذه زيارة عرض محفوظة على الجهاز، والملف مبني على تفاصيلها الحالية.</p>}
+        {!scheduled&&<p role="status">حدد وقت الوصول من الخطة أولًا؛ ما نفترض لك وقتًا.</p>}{failure&&<FeedbackError message={failure}/>}{isDemoMode&&<p className="text-xs text-muted-foreground">هذه زيارة عرض محفوظة على الجهاز، والملف مبني على تفاصيلها الحالية.</p>}
       </DialogContent>
     </Dialog>
   </>;
