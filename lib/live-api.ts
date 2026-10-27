@@ -16,6 +16,12 @@ export type MapSegment={visitMemberId:number;toPlanItemId:number;available:boole
 export type RouteData={segments:MapSegment[];planItems:ApiPlanItem[]};
 export type CreateVisit={plannedStartTime?:string;familyCount?:number;name:string;groupName?:string;visitDate:string;durationMinutes:number;maxParticipants:number;tripType:string;togetherMode:string|null;primaryGoal:string;includePrayer:boolean;goals:string};
 export const request=<T>(path:string,method='GET',body?:unknown)=>apiRequest('/api/v1/'+path,method,body) as Promise<T>;
+function normalizeProfileValue(value:unknown):string{
+ if(typeof value==='string'){try{return normalizeProfileValue(JSON.parse(value));}catch{return value;}}
+ if(Array.isArray(value))return JSON.stringify(value.map(normalizeProfileValue).sort());
+ if(value&&typeof value==='object')return JSON.stringify(Object.entries(value).sort(([a],[b])=>a.localeCompare(b)).map(([key,item])=>[key,normalizeProfileValue(item)]));
+ return String(value??'');
+}
 export const liveApi={
  rides:()=>request<LiveRide[]>('ride/get'),
  places:async()=>{const rows=await Promise.all(['RESTAURANT','PRAYER_ROOM','RESTROOM'].map(kind=>request<Place[]>('place/by-kind?kind='+kind)));return rows.flat();},
@@ -27,7 +33,16 @@ export const liveApi={
  delete:(id:number)=>request('visit/delete/'+id,'DELETE'),
  preferences:(id:number)=>request<{selectedRides:{rideId:number;priority:'MUST_RIDE'|'PREFERRED'|'OPTIONAL'}[];dislikedFeatures:string[];excludedRideIds?:number[];excludedRideTypes?:string[];answerStatus:string}>('visit-member/preferences/'+id),
  profile:()=>request<Profile>('visitor-profile/my-profile'),
- updateProfile:(dto:unknown)=>request('visitor-profile/update-my-profile','PUT',dto),
+ updateProfile:async(dto:Record<string,unknown>)=>{
+  await request('visitor-profile/update-my-profile','PUT',dto);
+  const saved=await request<Profile>('visitor-profile/my-profile');
+  for(const [field,value] of Object.entries(dto)){
+   const actual=saved[field as keyof Profile];
+   const matches=typeof value==='number'?Number(actual)===value:normalizeProfileValue(actual)===normalizeProfileValue(value);
+   if(!matches)throw new Error('تعذر تأكيد حفظ جميع بيانات ملفك؛ حدّث الصفحة وراجع بياناتك قبل إعادة الحفظ.');
+  }
+  return saved;
+ },
  members:(id:number)=>request<{members:Member[];total:number;goingCount:number}>('visit-member/summary/'+id),
  join:(code:string)=>request('visit-member/join','POST',{code}),
  rsvp:(id:number,value:'going'|'maybe'|'not-going')=>request(`visit-member/rsvp/${value}/${id}`,'PUT'),
