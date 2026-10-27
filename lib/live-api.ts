@@ -3,7 +3,7 @@ import type {ApiPlanDetails,ApiPlanItem,GenerationResult} from './backend-contra
 export type LiveVisit={id:number;name:string;visitDate:string;durationMinutes:number;maxParticipants:number;tripType:'SOLO'|'FRIENDS'|'FAMILY';togetherMode:'TOGETHER'|'SPLIT'|null;primaryGoal:string;includePrayer:boolean;status:'DRAFT'|'PLANNING'|'READY'|'IN_PROGRESS'|'COMPLETED'|'CANCELLED';membersLocked:boolean;organizerAccountId:number;plannedStartTime:string|null;expectedArrivalTime:string|null};
 export type Member={id:number;visitorProfileId:number|null;name:string;rsvpStatus:string};
 export type Profile={id:number;accountId:number;name:string;birthDate:string|null;heightCm:number|null;weightKg:number|null;gender:string|null;thrillPreference:string|null;preferredRideTypes:string|null;dislikedRideFeatures:string|null;foodPreferences:string|null};
-export type LiveRide={id:number;sourceRideId:string;name:string;status:string;category:string;land:string;waitMinutes:number|null;waitObservedAt:string|null;waitSource:string|null;rideFeatures:string[]};
+export type LiveRide={availabilitySource?:string|null;minHeightCm?:number|null;maxHeightCm?:number|null;warnings?:string|null;id:number;sourceRideId:string;name:string;status:string;category:string;land:string;waitMinutes:number|null;waitObservedAt:string|null;waitSource:string|null;rideFeatures:string[]};
 export type Place={id:number;sourcePlaceId:string;name:string;kind:string;status:string};
 export type RecordRow={id:number;planItemId:number;visitMemberId:number;status:string;rating:number|null;activitySessionId:number|null};
 export type Session={id:number;planItemId:number;visitMemberId:number;status:string;trackingMode:string;isRateable:boolean;rating:number|null};
