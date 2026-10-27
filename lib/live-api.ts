@@ -51,7 +51,7 @@ export const liveApi={
  consent:(consentKind:string)=>request('privacy-consent/add','POST',{consentKind,granted:true,policyVersion:process.env.NEXT_PUBLIC_CONSENT_POLICY_VERSION||'1.0'}),
  revokeConsent:(id:number)=>request('privacy-consent/revoke/'+id,'PUT'),
  notices:()=>request<Notice[]>('notification/get/my-notifications'),
- register:(dto:unknown)=>request('account/register','POST',dto),
+ register:(dto:unknown)=>request<{message:string;verificationEmailSent?:boolean}>('account/register','POST',dto),
  next:(id:number)=>request<{activityStatus:string;activity:ApiPlanItem|null;activitySession:Session|null}>('visit-plan/next-activity/'+id),
  startFamily:(itemId:number,ids:number[],gps=false)=>request<Session[]>('activity-session/start/manual/family/'+itemId,'POST',{visitMemberIds:ids}),
  completeFamily:(id:number,ids:number[],requestKey:string)=>request('activity-session/complete/family/'+id,'POST',{visitMemberIds:ids,requestKey}),
