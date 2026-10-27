@@ -1,4 +1,6 @@
 const messages:Record<string,string>={
+ 'Every participant must have a prayer break for each actual prayer event during the visit':'تعذر إدراج كل الصلوات ضمن الجدول المعتمد. راجع وقت الوصول ومدة الزيارة أو عدّل الخطة.',
+ 'The approved activities and actual prayer times cannot fit; review arrival time or duration':'الأنشطة المعتمدة ومواقيت الصلاة لا تتسع ضمن الزيارة؛ راجع وقت الوصول أو مدة الزيارة.',
  'Invalid email or password':'البريد الإلكتروني أو كلمة المرور غير صحيحة.',
  'Login required':'سجّل دخولك لإكمال الطلب.',
  'Access denied':'ما عندك صلاحية لتنفيذ هذا الطلب.',
