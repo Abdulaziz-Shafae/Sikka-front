@@ -2,7 +2,7 @@ import {paymentApi,type PlanningPreview} from './payment-api';
 import {apiRequest,SikkaApiError} from './api-client';
 import type {ApiPlanDetails,ApiPlanItem,GenerationResult} from './backend-contract';
 export type LiveVisit={id:number;name:string;visitDate:string;durationMinutes:number;maxParticipants:number;tripType:'SOLO'|'FRIENDS'|'FAMILY';togetherMode:'TOGETHER'|'SPLIT'|null;primaryGoal:string;includePrayer:boolean;status:'DRAFT'|'PLANNING'|'READY'|'IN_PROGRESS'|'COMPLETED'|'CANCELLED';membersLocked:boolean;organizerAccountId:number;plannedStartTime:string|null;expectedArrivalTime:string|null};
-export type Member={id:number;visitorProfileId:number|null;name:string;rsvpStatus:string};
+export type Member={familyMemberId?:number|null;id:number;visitorProfileId:number|null;name:string;rsvpStatus:string};
 export type Profile={id:number;accountId:number;name:string;birthDate:string|null;heightCm:number|null;weightKg:number|null;gender:string|null;thrillPreference:string|null;preferredRideTypes:string|null;dislikedRideFeatures:string|null;foodPreferences:string|null;healthData?:string|null};
 export type LiveRide={availabilitySource?:string|null;minHeightCm?:number|null;maxHeightCm?:number|null;warnings?:string|null;id:number;sourceRideId:string;name:string;status:string;category:string;land:string;waitMinutes:number|null;waitObservedAt:string|null;waitSource:string|null;rideFeatures:string[]};
 export type Place={cuisineTypes?:string[];serviceType?:string|null;availabilitySource?:string|null;id:number;sourcePlaceId:string;name:string;kind:string;status:string};
@@ -51,7 +51,7 @@ export const liveApi={
  family:()=>request<FamilyMember[]>('family-member/get/my'),
  saveFamily:(dto:unknown,id?:number)=>request(id?'family-member/update/'+id:'family-member/add',id?'PUT':'POST',dto),
  deleteFamily:(id:number)=>request('family-member/delete/'+id,'DELETE'),
- addFamily:(id:number,ids:number[])=>request('visit-member/add-family/'+id,'POST',{familyMemberIds:ids}),
+ addFamily:(id:number,ids:number[],maxParticipants?:number)=>request('visit-member/add-family/'+id,'POST',{familyMemberIds:ids,...(maxParticipants===undefined?{}:{maxParticipants})}),
  regenerateCode:(id:number)=>request<{message:string}>('visit-group/regenerate-code/'+id,'PUT'),
  plans:(id:number)=>request<{id:number;planKind:string;isActive:boolean}[]>('visit-plan/get/plans/'+id),
  ownPlan:(id:number)=>request<ApiPlanDetails>('visit-plan/get/my-individual-plan/'+id),

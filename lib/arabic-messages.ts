@@ -1,4 +1,15 @@
 const messages:Record<string,string>={
+ 'Replanning requires a started visit with scheduled activity times':'ابدأ الزيارة وأكّد وقت الوصول أولًا عشان نقدر نعدّل أوقات الخطة.',
+ 'The remaining visit time is unavailable; review the visit duration':'انتهت المدة المحددة للزيارة؛ راجع مدة الزيارة قبل طلب تعديل الخطة.',
+ 'The visit deadline was reached before the proposal could be saved':'انتهت مدة الزيارة أثناء تجهيز التعديل، لذلك ما حفظنا المقترح.',
+ 'Resolve the existing proposal before requesting another change':'عندك مقترح تعديل ينتظر القرار؛ اعتمده أو ارفضه قبل طلب تعديل جديد.',
+ 'Changes involving minors require a supervised group proposal from the organizer':'تعديل خطة مشارك أقل من 18 سنة يحتاج طلبًا من المنظّم ضمن خطة بإشراف.',
+ 'A replan must change no more than 25 percent of remaining editable activities; keep the approved schedule or request a separate review':'التعديل المطلوب يغيّر أكثر من ربع الأنشطة المتبقية؛ خطتك الحالية محفوظة. جرّب تعديلًا أصغر.',
+
+ 'Schedule arrival for an approved active plan before selecting a restaurant':'ثبت وقت الوصول من الخطة المعتمدة أولًا، أو اختر المطعم من خيارات الوجبات واحفظها.',
+ 'Family members exceed the configured visit capacity':'وصلت للعدد المحدد للزيارة والرقم يشملك أنت. عدّل العدد قبل إضافة أفراد آخرين.',
+ 'Visit details can only be changed while the visit is in DRAFT':'تعديل التفاصيل متاح قبل توليد الخطة؛ بعد الاعتماد استخدم تعديل الموعد والوجبات من الخطة.',
+
  'The park is closed on Mondays and Tuesdays':'المنتزه مقفل الاثنين والثلاثاء؛ اختر يوم ثاني.',
  'The park is closed on the selected date':'المنتزه مقفل في اليوم المحدد؛ اختر يوم ثاني.',
  'Choose an arrival and duration within park opening hours':'حدد وقت وصولك ومدة الزيارة ضمن ساعات عمل المنتزه.',
