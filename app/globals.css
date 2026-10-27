@@ -206,3 +206,5 @@ body,body *{font-family:var(--font-sans)!important}
 @media(max-width:560px){.person-form fieldset{padding:14px;gap:12px}.person-form fieldset>label:has(input[type=checkbox]){padding:14px}}
 
 .profile-return{display:flex;justify-content:flex-start;margin-bottom:22px}.profile-return>button{min-height:44px;padding:10px 16px;gap:10px;color:var(--blue);border-color:#c7d5ed;background:#fff;font-size:15px}.profile-return>button:hover{background:#edf3ff}
+
+.completion-dialog{max-height:85dvh;overflow:auto}.completion-dialog label.completion-person{display:flex;align-items:center;gap:12px;min-height:52px;padding:14px;margin-block:12px;border:1px solid #d8e1ef;border-radius:12px;cursor:pointer}.completion-person:has(input:checked){border-color:var(--blue);background:#edf3ff}.completion-person input[type=checkbox]{width:20px;height:20px;flex:0 0 20px;margin:0;accent-color:var(--blue)}

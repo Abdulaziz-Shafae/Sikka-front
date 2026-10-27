@@ -1,6 +1,7 @@
 'use client';
 import {FeedbackError} from './feedback';
 import {useEffect,useRef,useState} from 'react';
+import {flushSync} from 'react-dom';
 import {Button} from '@/components/ui/button';
 import {BackendSignIn} from './backend-sign-in';
 import {apiRequest,logout,SikkaApiError} from '@/lib/api-client';
@@ -28,9 +29,9 @@ export function Checkout({visitId,returning=false}:{visitId?:number;returning?:b
   const id=serverId(visitId||0);const current=await paymentApi.preview(id);setPreview(current);if(!current.paymentRequired)throw new Error('لا تحتاج دفعًا حاليًا. ارجع لتجهيز خطتك.');
   const orders=await paymentApi.orders(id);const pending=orders.filter(o=>o.status==='PENDING').sort((a,b)=>b.id-a.id)[0];const selected=pending?await paymentApi.details(pending.id):await paymentApi.create(id);setOrder(selected);
   const callback=new URL('/payment/return',location.origin);callback.searchParams.set('order',String(selected.id));callback.searchParams.set('visit',String(id));sessionStorage.setItem(`sikka-payment-visit:${selected.id}`,String(id));
-  const options=checkoutConfiguration(selected,key,callback.href);await loadMoyasar();if(!container.current)throw new Error('تعذر فتح نموذج الدفع');container.current.replaceChildren();
+  const options=checkoutConfiguration(selected,key,callback.href);await loadMoyasar();flushSync(()=>setFormReady(true));if(!container.current)throw new Error('تعذر فتح نموذج الدفع');container.current.replaceChildren();
   window.Moyasar!.init({...options,element:container.current,on_failure:(message:string)=>setError(message||'لم تكتمل العملية. لا تعِد الدفع قبل مراجعة حالة طلبك.')});setFormReady(true);
- }catch(e){fail(e);}finally{operation.current=false;setBusy(false);}}
+ }catch(e){setFormReady(false);container.current?.replaceChildren();fail(e);}finally{operation.current=false;setBusy(false);}}
  async function confirm(){if(operation.current)return;operation.current=true;setBusy(true);setError('');try{const query=new URLSearchParams(location.search);const target=query.get('visit')||sessionStorage.getItem(`sikka-payment-visit:${returnedOrder}`)||visitId;const result=await confirmVisitPayment(serverId(returnedOrder),paymentId,target);setOrder(result.order);setPreview(result.preview);sessionStorage.removeItem(`sikka-payment-visit:${result.order.id}`);location.replace(result.returnUrl);}catch(e){fail(e);}finally{operation.current=false;setBusy(false);}}
  useEffect(()=>{if(authenticated&&!returning)void load();},[authenticated,visitId,returning]);
  useEffect(()=>{if(authenticated&&returning&&paymentId&&returnedOrder&&!autoConfirmed.current){autoConfirmed.current=true;void confirm();}},[authenticated,returning,paymentId,returnedOrder]);

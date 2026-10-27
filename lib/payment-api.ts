@@ -22,7 +22,11 @@ export function checkoutConfiguration(order:PaymentOrder,publishableKey:string,c
  return {amount:paymentAmount(order),currency:'SAR',description:`Sikka visit planning, order ${order.id}`,publishable_api_key:publishableKey,callback_url:url.href,metadata:{order_id:String(order.id)},methods:['creditcard']};
 }
 export async function confirmVisitPayment(orderId:number,paymentId:string,expectedVisitId?:number|string|null){
- const order=await paymentApi.confirm(orderId,paymentId);
+ let order:PaymentOrder|undefined;
+ for(let attempt=0;attempt<3;attempt++){
+  try{order=await paymentApi.confirm(orderId,paymentId);break;}catch(error){if(!(error instanceof Error)||error.message!=='Payment is not completed yet'||attempt===2)throw error;await new Promise(resolve=>setTimeout(resolve,1500));}
+ }
+ if(!order)throw new Error('لم يتأكد نجاح الدفع بعد؛ حدّث حالة الطلب قبل إعادة الدفع.');
  if(order.status!=='PAID'||!order.verifiedAt)throw new Error(order.failureReason||'لم يتأكد نجاح الدفع بعد؛ حدّث الحالة قبل المحاولة مجددًا.');
  const visitId=serverId(order.visitId||expectedVisitId||0);
  const orders=await paymentApi.orders(visitId);

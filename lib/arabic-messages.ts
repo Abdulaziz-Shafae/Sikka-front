@@ -1,4 +1,7 @@
 const messages:Record<string,string>={
+ 'Finish the current activity before starting another activity':'كمّل النشاط الحالي أو اضغط تخطي قبل بدء النشاط التالي.',
+ 'Payment is not completed yet':'الدفع ما تأكد من بوابة الدفع بعد؛ حدّث حالة الطلب بدون إعادة الدفع.',
+
  'Replanning requires a started visit with scheduled activity times':'ابدأ الزيارة وأكّد وقت الوصول أولًا عشان نقدر نعدّل أوقات الخطة.',
  'The remaining visit time is unavailable; review the visit duration':'انتهت المدة المحددة للزيارة؛ راجع مدة الزيارة قبل طلب تعديل الخطة.',
  'The visit deadline was reached before the proposal could be saved':'انتهت مدة الزيارة أثناء تجهيز التعديل، لذلك ما حفظنا المقترح.',
