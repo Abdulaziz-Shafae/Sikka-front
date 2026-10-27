@@ -204,3 +204,5 @@ body,body *{font-family:var(--font-sans)!important}
 .person-form fieldset>label:hover{border-color:#849bc7}
 .person-form fieldset input[type=checkbox]{margin:4px 0 0;min-width:18px;height:18px}
 @media(max-width:560px){.person-form fieldset{padding:14px;gap:12px}.person-form fieldset>label:has(input[type=checkbox]){padding:14px}}
+
+.profile-return{display:flex;justify-content:flex-start;margin-bottom:22px}.profile-return>button{min-height:44px;padding:10px 16px;gap:10px;color:var(--blue);border-color:#c7d5ed;background:#fff;font-size:15px}.profile-return>button:hover{background:#edf3ff}
