@@ -1,2 +1,2 @@
-import {LiveSikka} from '@/components/sikka/live-sikka';
-export default function ConnectPage(){return <LiveSikka/>;}
+import Sikka from '../page';
+export default function ConnectPage(){return <Sikka/>;}
