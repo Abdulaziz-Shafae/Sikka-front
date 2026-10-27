@@ -23,6 +23,7 @@ export function LiveAuth({page,busy,mutate,onLogin,navigate,initialEmail}:{initi
  {['verify','reset'].includes(page)&&<Field label="رمز التأكيد"><Input name="code" required inputMode="numeric" pattern="[0-9]{6}" maxLength={6} autoComplete="one-time-code"/></Field>}
  {['login','signup','reset'].includes(page)&&<Field label="كلمة المرور"><Input name="password" type="password" required minLength={8} autoComplete={page==='login'?'current-password':'new-password'}/></Field>}
  {!apiConfigured()&&<p role="alert">خادم سكة غير مضبوط في هذه النسخة.</p>}<Button disabled={busy||!apiConfigured()} type="submit">{busy?'لحظات…':page==='login'?'ادخل':page==='signup'?'إنشاء حساب':page==='verify'?'تفعيل الحساب':page==='forgot'?'اطلب رمز الاستعادة':'تأكيد'}</Button>
+ {page==='verify'&&<p className="inline-note">إذا هذي أول مرة تطلب رمز التفعيل وما وصلك، اطلبه مرة ثانية بعد دقيقتين. شيّك البريد غير المرغوب فيه أيضًا.</p>}
  {page==='verify'&&<Button type="button" variant="outline" disabled={busy||!email} onClick={()=>mutate(()=>backendApi.resendVerification(email),'تم استلام طلب إعادة الإرسال')}>أعد إرسال الرمز</Button>}
  <div className="readiness-actions"><Button type="button" variant="ghost" onClick={()=>navigate(page==='login'?'signup':'login')}>{page==='login'?'إنشاء حساب':'تسجيل الدخول'}</Button><Button type="button" variant="ghost" onClick={()=>navigate('forgot')}>نسيت كلمة المرور</Button><Button type="button" variant="ghost" onClick={()=>navigate('verify')}>تفعيل البريد</Button></div>
  </form></div>;
