@@ -30,7 +30,7 @@ export function normalizeStoredPlan(details:ApiPlanDetails,catalogue:ApiRide[],m
 export const backendApi={
  preview:(id:number)=>apiRequest(`/api/v1/visit/preview/${positive(id)}`),
  members:(id:number)=>apiRequest(`/api/v1/visit-member/summary/${positive(id)}`),
- memberPreferences:(id:number,dto:ReturnType<typeof preferencesPayload>)=>apiRequest(`/api/v1/visit-member/preferences/${positive(id)}`,'PUT',dto),
+ memberPreferences:(id:number,dto:ReturnType<typeof preferencesPayload>&{excludedRideIds?:number[];excludedRideTypes?:string[]})=>apiRequest(`/api/v1/visit-member/preferences/${positive(id)}`,'PUT',dto),
  skipPreferences:(id:number)=>apiRequest(`/api/v1/visit-member/preferences/skip/${positive(id)}`,'PUT'),
  mealPreferences:(id:number,dto:unknown)=>apiRequest(`/api/v1/visit-meal-break/preferences/${positive(id)}`,'PUT',dto),
  generate:(id:number,requestKey:string)=>apiRequest(`/api/v1/visit-plan/generate/${positive(id)}`,'POST',{requestKey}) as Promise<GenerationResult>,

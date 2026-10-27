@@ -4,7 +4,7 @@ function load(name){if(cache[name])return cache[name];const out={};cache[name]=o
 (async()=>{
  process.env.NEXT_PUBLIC_SIKKA_API_URL='/api/backend';
  const client=load('lib/api-client'),payments=load('lib/payment-api');const requests=[];let response={id:2,name:'QA',email:'qa@example.test',role:'USER',emailVerified:true},status=200;
- global.fetch=async(url,options)=>{requests.push({url,options});return new Response(JSON.stringify(response),{status,headers:{'Content-Type':'application/json'}});};
+ global.fetch=async(url,options)=>{requests.push({url,options});return new Response(JSON.stringify(typeof response==='function'?response(url):response),{status,headers:{'Content-Type':'application/json'}});};
  await client.authenticate('qa@example.test','not-persisted');assert.equal(client.hasAuthentication(),true);assert.equal(requests[0].url,'/api/backend/api/v1/auth/login');assert.equal(requests[0].options.headers.Authorization,undefined);assert.equal(requests[0].options.body.get('username'),'qa@example.test');assert.equal(requests[0].options.credentials,'include');
  response={id:17,status:'PENDING',amountSar:'29.00',verifiedAt:null};const order=await payments.paymentApi.create(9);assert.equal(order.amountSar,29);assert.equal(requests.at(-1).url,'/api/backend/api/v1/payment-order/add/9');
  const config=payments.checkoutConfiguration(order,'pk_test_example','https://sikka.example/payment/return?order=17');assert.equal(config.amount,2900);assert.deepEqual(config.metadata,{order_id:'17'});
@@ -13,6 +13,11 @@ function load(name){if(cache[name])return cache[name];const out={};cache[name]=o
  assert.throws(()=>payments.checkoutConfiguration(order,'sk_live_do_not_expose','https://sikka.example/payment/return'));
  assert.throws(()=>payments.checkoutConfiguration(order,'pk_test_example','http://sikka.example/payment/return'));
  await assert.rejects(()=>payments.paymentApi.confirm(0,'payment-123'));await assert.rejects(()=>payments.paymentApi.confirm(17,'bad id?'));
+ const paidOrder={...order,visitId:9,status:'PAID',verifiedAt:'2026-10-26T17:00:00'};
+ response=url=>url.includes('/confirm/')?paidOrder:url.includes('/get/visit/')?[paidOrder]:{readyToGenerate:true,paymentRequired:false,freeRemaining:0,entitlementStatus:'PAID'};
+ const destination=await payments.confirmVisitPayment(17,'payment-123',999);assert.equal(destination.visitId,9);assert.equal(destination.returnUrl,'/connect?payment=success#visit/9/preview');assert.equal(destination.preview.entitlementStatus,'PAID');assert.equal(destination.preview.freeRemaining,0);
+ response=url=>url.includes('/confirm/')?{...paidOrder,verifiedAt:null}:[paidOrder];await assert.rejects(()=>payments.confirmVisitPayment(17,'payment-123',9));
+ response=url=>url.includes('/confirm/')?paidOrder:[];await assert.rejects(()=>payments.confirmVisitPayment(17,'payment-123',9));
  response={message:'Login required'};status=401;await assert.rejects(()=>client.apiRequest('/api/v1/visit/my-visits'),e=>e.status===401);assert.equal(client.hasAuthentication(),false);
  status=200;response={id:3,name:'QA',email:'qa@example.test'};await client.authenticate('qa@example.test','again');client.clearAuthentication();await client.apiRequest('/api/v1/account/me');assert.equal(requests.at(-1).options.headers.Authorization,undefined);
  // Gateway never accepts a target from the browser, leaks an Authorization header in its response, or forwards cross-origin writes.

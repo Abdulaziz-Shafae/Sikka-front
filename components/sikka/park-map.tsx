@@ -47,7 +47,7 @@ export function ParkMap({ compact = false, onRide, itinerary=[],focusedKey,onAct
   const route = useMemo(() => routing ? findRoute(origin, destination) : null, [routing, origin, destination]);
   const markers = mapPositions.filter(m => m.kind === layerKinds[layer]&&(layer!=='places'||!foodFilters.length||restaurants.some(p=>p.name.toLowerCase()===m.name.toLowerCase()&&p.cuisineTypes.some(c=>foodFilters.includes(c)))));
   const nextKey=itinerary.find(a=>!a.completed)?.key;
-  useEffect(()=>{const next=mapPositions.find(m=>m.id===nextKey);if(!next)return;setSelected(next.id);const target=layers.find(l=>layerKinds[l.id]===next.kind);if(target)setLayer(target.id);},[nextKey]);
+  useEffect(()=>{const next=mapPositions.find(m=>m.id===nextKey);if(!next||!map.size.width||!map.size.height)return;setSelected(next.id);const target=layers.find(l=>layerKinds[l.id]===next.kind);if(target)setLayer(target.id);map.zoomToPoints([next]);setExpandedCluster([]);},[nextKey,!!map.size.width,!!map.size.height]);
   const nextMarker=markers.find(m=>m.id===nextKey);
   const clusters = [...clusterMapMarkers(markers.filter(m=>m.id!==nextKey), map.view, map.size),...(nextMarker?clusterMapMarkers([nextMarker],map.view,map.size):[])];
   const showAreas=map.size.width>0&&map.view.scale<fitMapView(mapFitPoints,map.size).scale*2&&!routing&&!expandedCluster.length&&layer==='rides'&&!itinerary.length;

@@ -14,3 +14,6 @@ export function hasPlanningProfile(profile:{birthDate:string|null;heightCm:numbe
 export function extractInviteCode(message:string){return message.match(/invite code:\s*([A-Za-z0-9]+)/i)?.[1]||'';}
 
 export function formatPlanOffset(minutes:number){return `${String(Math.floor(minutes/60)).padStart(2,'0')}:${String(minutes%60).padStart(2,'0')}`;}
+
+export function visitCategory(visit:{status:string;visitDate:string},today:string){return visit.status==='IN_PROGRESS'&&visit.visitDate===today?'current':visit.visitDate<today||['COMPLETED','CANCELLED'].includes(visit.status)?'past':'upcoming';}
+export function parkOpening(date:string){const day=new Date(date+'T12:00:00+03:00').getUTCDay();return day===1||day===2?null:day===6?'12:00':'16:00';}

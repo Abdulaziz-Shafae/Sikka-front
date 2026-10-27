@@ -1,4 +1,14 @@
 const messages:Record<string,string>={
+ 'The park is closed on Mondays and Tuesdays':'المنتزه مقفل الاثنين والثلاثاء؛ اختر يوم ثاني.',
+ 'The park is closed on the selected date':'المنتزه مقفل في اليوم المحدد؛ اختر يوم ثاني.',
+ 'Choose an arrival and duration within park opening hours':'حدد وقت وصولك ومدة الزيارة ضمن ساعات عمل المنتزه.',
+ 'Only the organizer chooses rides for a together visit':'في وضع مع بعض، المنظّم يختار الألعاب للجميع.',
+ 'This member has already answered':'هذا العضو أكمل إجاباته وما يحتاج تذكير.',
+ 'The approved activities and food breaks exceed the visit duration; increase the duration or review the plan':'الألعاب المعتمدة والوجبات ما تتسع ضمن المدة. خطتك السابقة محفوظة؛ قلل الوجبات أو راجع الموعد.',
+ 'The generated plan repeats a ride without explicit repeat permission':'اللعبة متكررة في الجدول؛ لم نحفظ الخطة المتعارضة.',
+ 'A ride must appear only once in the group plan':'اللعبة لازم تظهر مرة وحدة في الخطة؛ لم نحفظ الجدول المتكرر.',
+ 'The activity has already been completed or skipped':'النشاط مسجل بالفعل؛ حدّث الخطة لعرض آخر حالة.',
+
  'Every participant must have a prayer break for each actual prayer event during the visit':'تعذر إدراج كل الصلوات ضمن الجدول المعتمد. راجع وقت الوصول ومدة الزيارة أو عدّل الخطة.',
  'The approved activities and actual prayer times cannot fit; review arrival time or duration':'الأنشطة المعتمدة ومواقيت الصلاة لا تتسع ضمن الزيارة؛ راجع وقت الوصول أو مدة الزيارة.',
  'Invalid email or password':'البريد الإلكتروني أو كلمة المرور غير صحيحة.',

@@ -1,5 +1,5 @@
 import {apiRequest} from './api-client';
-export type PaymentOrder={id:number;amountSar:number;status:'PENDING'|'PAID'|'FAILED';moyasarPaymentId:string|null;verifiedAt:string|null;failureReason:string|null};
+export type PaymentOrder={visitId?:number|null;id:number;amountSar:number;status:'PENDING'|'PAID'|'FAILED';moyasarPaymentId:string|null;verifiedAt:string|null;failureReason:string|null};
 export type PlanningPreview={members?:{visitMemberId:number;name:string;answerStatus:string;missingFields:string[];warnings:string[]}[];readyToGenerate:boolean;paymentRequired:boolean;freeRemaining:number;priceSar:number;entitlementStatus:string;missingFields:string[];warnings:string[]};
 export function serverId(value:number|string){const n=Number(value);if(!Number.isSafeInteger(n)||n<=0)throw new Error('افتح الدفع من زيارة محفوظة في حسابك');return n;}
 export function parseOrder(raw:unknown):PaymentOrder{
@@ -20,4 +20,13 @@ export function checkoutConfiguration(order:PaymentOrder,publishableKey:string,c
  if(!/^pk_(test|live)_[a-zA-Z0-9_-]+$/.test(publishableKey))throw new Error('مفتاح الدفع العام غير مضبوط');
  const url=new URL(callbackUrl);if(url.protocol!=='https:'&&!['localhost','127.0.0.1'].includes(url.hostname))throw new Error('الدفع يتطلب اتصال HTTPS');
  return {amount:paymentAmount(order),currency:'SAR',description:`Sikka visit planning, order ${order.id}`,publishable_api_key:publishableKey,callback_url:url.href,metadata:{order_id:String(order.id)},methods:['creditcard']};
+}
+export async function confirmVisitPayment(orderId:number,paymentId:string,expectedVisitId?:number|string|null){
+ const order=await paymentApi.confirm(orderId,paymentId);
+ if(order.status!=='PAID'||!order.verifiedAt)throw new Error(order.failureReason||'لم يتأكد نجاح الدفع بعد؛ حدّث الحالة قبل المحاولة مجددًا.');
+ const visitId=serverId(order.visitId||expectedVisitId||0);
+ const orders=await paymentApi.orders(visitId);
+ if(!orders.some(item=>item.id===order.id&&item.status==='PAID'&&item.verifiedAt))throw new Error('تعذر تحديد الزيارة المدفوعة؛ افتح الزيارة من حسابك وحدّث حالتها.');
+ const preview=await paymentApi.preview(visitId);
+ return {order,preview,visitId,returnUrl:`/connect?payment=success#visit/${visitId}/preview`};
 }
