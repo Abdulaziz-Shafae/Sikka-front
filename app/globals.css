@@ -208,3 +208,11 @@ body,body *{font-family:var(--font-sans)!important}
 .profile-return{display:flex;justify-content:flex-start;margin-bottom:22px}.profile-return>button{min-height:44px;padding:10px 16px;gap:10px;color:var(--blue);border-color:#c7d5ed;background:#fff;font-size:15px}.profile-return>button:hover{background:#edf3ff}
 
 .completion-dialog{max-height:85dvh;overflow:auto}.completion-dialog label.completion-person{display:flex;align-items:center;gap:12px;min-height:52px;padding:14px;margin-block:12px;border:1px solid #d8e1ef;border-radius:12px;cursor:pointer}.completion-person:has(input:checked){border-color:var(--blue);background:#edf3ff}.completion-person input[type=checkbox]{width:20px;height:20px;flex:0 0 20px;margin:0;accent-color:var(--blue)}
+
+/* Profile layout and hero prompt alignment. */
+.profile-page{width:100%;max-width:820px;margin-inline:auto;min-width:0}
+.profile-page>h1{text-align:right;margin:0 0 24px;font-size:clamp(32px,4vw,52px);line-height:1.5}
+.profile-page>.person-form{width:100%;max-width:none;margin:0}
+.profile-page>.readiness-actions{margin-top:20px}
+.hero-profile-prompt{align-items:center;color:var(--yellow);text-shadow:0 2px 8px #041437}
+.hero-profile-prompt>a{color:var(--yellow)}
