@@ -78,7 +78,7 @@ export function LivePlan({activeView=false,onRegenerate,details,visit,members,me
  {!proposal&&details.plan.planKind==='GROUP'&&!['APPROVED','PENDING','REJECTED'].includes(details.approvalStatus||'')&&leader&&<Button className="approve-plan" disabled={busy} onClick={()=>mutate(async()=>{try{await liveApi.createApproval(details.plan.id);await backendApi.approve(details.plan.id);}finally{await reload();}},'اعتمدت الخطة')}>اعتمد الخطة</Button>}
 
 
- {leader&&onRegenerate&&!['IN_PROGRESS','COMPLETED','CANCELLED'].includes(visit.status)&&<Button variant="outline" disabled={busy||!!proposal} onClick={onRegenerate}>ولّد لي خطة ثانية</Button>}
+
  {details.approvalStatus==='APPROVED'&&<CalendarExport visit={calendarVisit}/>}
  </section>;
 }
