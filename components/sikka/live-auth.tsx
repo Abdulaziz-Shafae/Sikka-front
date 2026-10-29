@@ -12,7 +12,7 @@ export function LiveAuth({page,busy,mutate,onLogin,navigate,initialEmail}:{initi
  const [email,setEmail]=useState(initialEmail||''),[notice,setNotice]=useState('');
  useEffect(()=>{if(initialEmail)setEmail(initialEmail);},[initialEmail]);
  return <div className="container page-space narrow-page"><form className="profile-form" onSubmit={async e=>{e.preventDefault();const form=e.currentTarget;const f=new FormData(form);await mutate(async()=>{
-  if(page==='signup'){const result=await liveApi.register({name:String(f.get('name')),email:email.trim(),password:String(f.get('password'))});toast.info(result.verificationEmailSent===false?'حسابك انحفظ، لكن تعذر إرسال رمز التفعيل. تقدر تعيد طلبه من صفحة تأكيد البريد.':'حياك في سكة! كمّل ملفك واهتماماتك، وفعّل بريدك قبل إنشاء زيارة.');try{const account=await authenticate(email.trim(),String(f.get('password')));form.reset();onLogin(account,'profile');}catch{setNotice('تم إنشاء حسابك. فعّل بريدك ثم سجّل الدخول لإكمال ملفك.');navigate('verify');}}
+  if(page==='signup'){await liveApi.register({name:String(f.get('name')),email:email.trim(),password:String(f.get('password'))});toast.success('حياك في سكة! حسابك جاهز، كمّل ملفك واهتماماتك.');try{const account=await authenticate(email.trim(),String(f.get('password')));form.reset();onLogin(account,'profile');}catch{setNotice('تم إنشاء حسابك. سجّل الدخول لإكمال ملفك.');navigate('login');}}
 
   else if(page==='verify'){await backendApi.verifyEmail(email,String(f.get('code')));navigate('login');}
   else if(page==='forgot'){await backendApi.forgotPassword(email);navigate('reset');}
