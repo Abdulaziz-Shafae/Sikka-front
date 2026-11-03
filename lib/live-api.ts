@@ -10,7 +10,7 @@ export type Session={id:number;planItemId:number;visitMemberId:number;status:str
 export type MealBreak={id:number;breakKey:string;mealChoice:string;preferredTiming:string;visitMemberId:number;placeId:number|null;planItemId:number|null};
 export type FamilyMember={id:number;name:string;birthDate:string;heightCm:number|null;weightKg:number|null;gender:string};
 export type Consent={id:number;consentKind:string;granted:boolean;policyVersion:string};
-export type Notice={id:number;visitId:number;title:string;message:string;type:string;readAt:string|null;respondedAt:string|null;actionType:string|null};
+export type Notice={id:number;visitId:number|null;title:string;message:string;type:string;readAt:string|null;respondedAt:string|null;actionType:string|null;createdAt:string|null;sentAt:string|null};
 export type MapSegment={visitMemberId:number;toPlanItemId:number;available:boolean;estimated:boolean;route?:{points:number[][];distanceMeters:number};reason?:string};
 export type RouteData={segments:MapSegment[];planItems:ApiPlanItem[]};
 export type CreateVisit={name:string;groupName?:string;visitDate:string;durationMinutes:number;maxParticipants:number;tripType:string;togetherMode:string|null;primaryGoal:string;includePrayer:boolean;goals:string};
@@ -51,6 +51,7 @@ export const liveApi={
  consent:(consentKind:string)=>request('privacy-consent/add','POST',{consentKind,granted:true,policyVersion:process.env.NEXT_PUBLIC_CONSENT_POLICY_VERSION||'1.0'}),
  revokeConsent:(id:number)=>request('privacy-consent/revoke/'+id,'PUT'),
  notices:()=>request<Notice[]>('notification/get/my-notifications'),
+ readNotice:(id:number)=>request('notification/read/'+id,'PUT'),
  register:(dto:unknown)=>request<{message:string;verificationEmailSent?:boolean}>('account/register','POST',dto),
  next:(id:number)=>request<{activityStatus:string;activity:ApiPlanItem|null;activitySession:Session|null}>('visit-plan/next-activity/'+id),
  startFamily:(itemId:number,ids:number[],gps=false)=>request<Session[]>('activity-session/start/manual/family/'+itemId,'POST',{visitMemberIds:ids}),
