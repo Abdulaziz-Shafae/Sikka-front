@@ -30,6 +30,6 @@ export function LiveAuth({page,busy,mutate,onLogin,navigate,initialEmail}:{initi
  {!apiConfigured()&&<FeedbackError message="خادم سكة غير مضبوط في هذه النسخة."/>}<Button disabled={busy||!apiConfigured()} type="submit">{busy?'لحظات…':page==='login'?'ادخل':page==='signup'?'إنشاء حساب':page==='verify'?'تفعيل الحساب':page==='forgot'?'اطلب رمز الاستعادة':'تأكيد'}</Button>
  {page==='verify'&&<p className="inline-note">إذا هذي أول مرة تطلب رمز التفعيل وما وصلك، اطلبه مرة ثانية بعد دقيقتين. شيّك البريد غير المرغوب فيه أيضًا.</p>}
  {page==='verify'&&<Button type="button" variant="outline" disabled={busy||!email} onClick={()=>mutate(()=>backendApi.resendVerification(email),'تم استلام طلب إعادة الإرسال')}>أعد إرسال الرمز</Button>}
- <div className="readiness-actions"><Button type="button" variant="ghost" onClick={()=>navigate(page==='login'?'signup':'login')}>{page==='login'?'إنشاء حساب':'تسجيل الدخول'}</Button><Button type="button" variant="ghost" onClick={()=>navigate('forgot')}>نسيت كلمة المرور</Button></div>
+ <div className="readiness-actions"><Button type="button" variant="ghost" onClick={()=>navigate(page==='login'?'signup':'login')}>{page==='login'?'إنشاء حساب':'تسجيل الدخول'}</Button><Button type="button" variant="ghost" onClick={()=>navigate('forgot')}>نسيت كلمة المرور</Button>{page==='login'&&<Button type='button' variant='ghost' onClick={()=>navigate('verify')}>فعّل بريدك</Button>}</div>
  </form></div>;
 }
