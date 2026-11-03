@@ -9,16 +9,17 @@ import {backendApi} from '@/lib/backend-contract';
 import {liveApi} from '@/lib/live-api';
 import {Field,type Mutate} from './live-forms';
 export function LiveAuth({page,busy,mutate,onLogin,navigate,initialEmail}:{initialEmail?:string;page:string;busy:boolean;mutate:Mutate;onLogin:(a:CurrentAccount,target?:string)=>void;navigate:(p:string)=>void}){
- const [email,setEmail]=useState(initialEmail||''),[notice,setNotice]=useState('');
+ const [email,setEmail]=useState(initialEmail||''),[notice,setNotice]=useState(''),[newAccountPendingOnboarding,setNewAccountPendingOnboarding]=useState(false);
  useEffect(()=>{if(initialEmail)setEmail(initialEmail);},[initialEmail]);
  return <div className="container page-space narrow-page"><form className="profile-form" onSubmit={async e=>{e.preventDefault();const form=e.currentTarget;const f=new FormData(form);await mutate(async()=>{
-  if(page==='signup'){const result=await liveApi.register({name:String(f.get('name')),email:email.trim(),password:String(f.get('password'))});form.reset();toast.success(result.verificationEmailSent?'أرسلنا رمز التفعيل إلى بريدك.':'تم إنشاء الحساب، اطلب إعادة إرسال رمز التفعيل من الصفحة التالية.');navigate('verify');}
-  // Existing profile-onboarding experience continues after the user verifies email and logs in.
+  if(page==='signup'){const result=await liveApi.register({name:String(f.get('name')),email:email.trim(),password:String(f.get('password'))});form.reset();setNewAccountPendingOnboarding(true);toast.success(result.verificationEmailSent?'أرسلنا رمز التفعيل إلى بريدك.':'تم إنشاء الحساب، اطلب إعادة إرسال رمز التفعيل من الصفحة التالية.');navigate('verify');}
+  // Legacy immediate-login signup route is paused: previously signup authenticated then opened 'profile' directly.
+  // New flow preserves 'profile' onboarding after the email is verified and login succeeds.
 
   else if(page==='verify'){await backendApi.verifyEmail(email,String(f.get('code')));toast.success('تم تأكيد بريدك، تقدر تسجّل دخولك وتكمل ملفك.');navigate('login');}
   else if(page==='forgot'){await backendApi.forgotPassword(email);navigate('reset');}
   else if(page==='reset'){await backendApi.resetPassword({email,code:String(f.get('code')),newPassword:String(f.get('password'))});form.reset();navigate('login');}
-  else{const account=await authenticate(email.trim(),String(f.get('password')));form.reset();onLogin(account);}
+  else{const account=await authenticate(email.trim(),String(f.get('password')));form.reset();onLogin(account,newAccountPendingOnboarding?'profile':'home');setNewAccountPendingOnboarding(false);}
  },page==='signup'?undefined:page==='login'?'حيّاك في سكة':page==='forgot'?'تم استلام طلب الاستعادة':'تمت العملية من سكة');}}>
  <h1>{page==='signup'?'سكتك تبدأ هنا':page==='verify'?'أكد بريدك':page==='forgot'?'نرجعك لحسابك':page==='reset'?'كلمة مرور جديدة':'حيّاك من جديد'}</h1>
  {notice&&<FeedbackError message={notice}/>}
