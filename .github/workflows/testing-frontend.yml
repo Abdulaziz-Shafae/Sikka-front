@@ -1,0 +1,28 @@
+name: Validate Sikka Frontend (testing)
+on:
+  push:
+    branches: [testing]
+  pull_request:
+    branches: [testing]
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.25.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run typecheck
+      - run: pnpm run check:flows
+      - run: pnpm run check:integration
+      - run: pnpm run build:railway
