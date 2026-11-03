@@ -1,4 +1,5 @@
 'use client';
+import {rejectedPlanFeedback} from '@/lib/plan-feedback';
 import {FeedbackError} from './feedback';
 import {StarRating} from './star-rating';
 import {activityControls,completionParticipants,activityFinished} from '@/lib/execution-ui';
@@ -75,6 +76,8 @@ export function LivePlan({activeView=false,onRegenerate,details,visit,members,me
  {visit.status==='COMPLETED'&&<Button onClick={()=>{location.hash=`visit/${visit.id}/review`;requestAnimationFrame(()=>window.scrollTo({top:0,behavior:'instant'}));}}>قيّم طلعتك</Button>}
  {leader&&visit.status==='IN_PROGRESS'&&<Button disabled={busy||!!proposal} onClick={()=>{if(confirm('تنهي الزيارة؟ لن نعلّم الأنشطة المتبقية مكتملة.'))void mutate(async()=>{await backendApi.finish(visit.id);await reload();location.hash=`visit/${visit.id}/review`;requestAnimationFrame(()=>window.scrollTo({top:0,behavior:'instant'}));},'انتهت الزيارة');}}>إنهاء الزيارة</Button>}
 {!proposal&&details.plan.planKind==='GROUP'&&details.approvalStatus==='PENDING'&&leader&&<div className="readiness-actions"><Button className="approve-plan" disabled={busy} onClick={()=>mutate(async()=>{await backendApi.approve(details.plan.id);await reload();},'اعتمدت الخطة')}>اعتمد الخطة</Button><Button variant="outline" disabled={busy} onClick={()=>mutate(async()=>{await backendApi.reject(details.plan.id);location.hash=`visit/${visit.id}/plan`;await reload();},'تم رفض الخطة')} className="reject-plan">ارفض الخطة</Button></div>}
+ {/* Testing point 06: previously rejecting a generated plan returned to the same page without a clear next action. */}
+ {!proposal&&details.plan.planKind==='GROUP'&&details.approvalStatus==='REJECTED'&&leader&&<div className="readiness-panel" role="status"><p>{rejectedPlanFeedback}</p><Button type="button" variant="outline" disabled={busy} onClick={()=>{location.hash=`visit/${visit.id}/preview`;}}>راجع الزيارة وأعد التوليد</Button></div>}
  {!proposal&&details.plan.planKind==='GROUP'&&!['APPROVED','PENDING','REJECTED'].includes(details.approvalStatus||'')&&leader&&<Button className="approve-plan" disabled={busy} onClick={()=>mutate(async()=>{try{await liveApi.createApproval(details.plan.id);await backendApi.approve(details.plan.id);}finally{await reload();}},'اعتمدت الخطة')}>اعتمد الخطة</Button>}
 
 
