@@ -19,7 +19,7 @@ export function LiveVisitRecap({visit,onBack}:{visit:LiveVisit;onBack:()=>void})
  const [loading,setLoading]=useState(true);
  const [error,setError]=useState('');
  useEffect(()=>{let alive=true;void liveApi.records(visit.id).then(rows=>{if(alive){setRecords(rows);setError('');}}).catch(()=>{if(alive)setError('ما قدرنا نجيب الألعاب المكتملة. جرّب تفتح الصفحة مرة ثانية.');}).finally(()=>{if(alive)setLoading(false);});return()=>{alive=false;};},[visit.id]);
- useEffect(()=>{let active=true;let objectUrl='';void apiResponse('/api/v1/visit-member/recap-image/'+visit.id).then(async response=>{const blob=await response.blob();if(!active)return;objectUrl=URL.createObjectURL(blob);setRecapImage(objectUrl);setImageError('');}).catch(()=>{if(active)setImageError('صورة الملخص غير متاحة حاليًا، لكن تفاصيل زيارتك محفوظة.');});return()=>{active=false;if(objectUrl)URL.revokeObjectURL(objectUrl);};},[visit.id]);
+ useEffect(()=>{let active=true;let objectUrl='';void apiResponse('/api/v1/visit-member/recap-image/'+visit.id,'GET',undefined,'image/png').then(async response=>{const blob=await response.blob();if(!active)return;objectUrl=URL.createObjectURL(blob);setRecapImage(objectUrl);setImageError('');}).catch(()=>{if(active)setImageError('صورة الملخص غير متاحة حاليًا، لكن تفاصيل زيارتك محفوظة.');});return()=>{active=false;if(objectUrl)URL.revokeObjectURL(objectUrl);};},[visit.id]);
  const completed=records.filter(r=>r.status==='COMPLETED'&&r.rideId&&r.completedAt).sort((a,b)=>(a.completedAt||'').localeCompare(b.completedAt||''));
  const duration=minutesBetween(visit.startedAt,visit.completedAt);
  return <section className="readiness-panel" dir="rtl">
