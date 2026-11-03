@@ -83,14 +83,25 @@ export function LiveNotificationAlerts({accountId,onVisit}:{accountId:number;onV
  async function selectRestaurant(){
   if(!current?.visitId||!current.planItemId)throw new Error('بريك الأكل غير مرتبط بالخطة.');
   if(!cuisine)throw new Error('اختَر نوع الأكل.');
-  const [meals,places]=await Promise.all([liveApi.mealBreaks(current.visitId),liveApi.places()]);
+  const visitId=current.visitId;
+  const [meals,places,plan,rides]=await Promise.all([liveApi.mealBreaks(visitId),liveApi.places(),liveApi.groupPlan(visitId),liveApi.rides()]);
   const meal=meals.find(m=>m.planItemId===current.planItemId&&!m.placeId);
   if(!meal)throw new Error('تم اختيار مطعم من قبل، أو انتهى وقت اختيار المطعم.');
   const matching=places.filter(p=>p.kind==='RESTAURANT'&&p.status==='OPEN'&&(cuisine==='any'||mealKeywords[cuisine]?.test(p.name+' '+(p.description||''))));
   if(!matching.length)throw new Error('ما لقينا مطعمًا مفتوحًا ومؤكدًا لهذا النوع. اختَر نوعًا ثانيًا أو ابحث يدويًا.');
-  // The server validates that the selected restaurant has a walking-network route and fits the schedule.
-  // Never claim a nearby route based on the client list's ordering.
-  await liveApi.restaurant(current.visitId,meal.breakKey,matching[0].id);
+  const food=plan.planItems.find(a=>a.id===meal.planItemId);
+  const before=plan.planItems.filter(a=>a.rideId&&food&&a.sortOrder<food.sortOrder).sort((a,b)=>b.sortOrder-a.sortOrder)[0];
+  const origin=rides.find(r=>r.id===before?.rideId);
+  const coordinate=(value:number|null|undefined)=>value===undefined||value===null?null:Number(value);
+  const x=coordinate(origin?.mapX),y=coordinate(origin?.mapY);
+  const score=(place:Place)=>{
+   const px=coordinate(place.mapX),py=coordinate(place.mapY);
+   if(x!==null&&y!==null&&px!==null&&py!==null)return (x-px)**2+(y-py)**2;
+   return place.land&&origin?.land&&place.land===origin.land?0:1;
+  };
+  matching.sort((a,b)=>score(a)-score(b)||a.id-b.id);
+  // Final timetable, walking-route availability and shared-party permissions are verified by Spring Boot.
+  await liveApi.restaurant(visitId,meal.breakKey,matching[0].id);
   await markRead();
  }
  async function applyAutomaticReplan(replace:boolean){
