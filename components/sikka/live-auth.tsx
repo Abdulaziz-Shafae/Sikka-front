@@ -12,9 +12,10 @@ export function LiveAuth({page,busy,mutate,onLogin,navigate,initialEmail}:{initi
  const [email,setEmail]=useState(initialEmail||''),[notice,setNotice]=useState('');
  useEffect(()=>{if(initialEmail)setEmail(initialEmail);},[initialEmail]);
  return <div className="container page-space narrow-page"><form className="profile-form" onSubmit={async e=>{e.preventDefault();const form=e.currentTarget;const f=new FormData(form);await mutate(async()=>{
-  if(page==='signup'){await liveApi.register({name:String(f.get('name')),email:email.trim(),password:String(f.get('password'))});toast.success('حياك في سكة! حسابك جاهز، كمّل ملفك واهتماماتك.');try{const account=await authenticate(email.trim(),String(f.get('password')));form.reset();onLogin(account,'profile');}catch{setNotice('تم إنشاء حسابك. سجّل الدخول لإكمال ملفك.');navigate('login');}}
+  if(page==='signup'){const result=await liveApi.register({name:String(f.get('name')),email:email.trim(),password:String(f.get('password'))});form.reset();toast.success(result.verificationEmailSent?'أرسلنا رمز التفعيل إلى بريدك.':'تم إنشاء الحساب، اطلب إعادة إرسال رمز التفعيل من الصفحة التالية.');navigate('verify');}
+  // Existing profile-onboarding experience continues after the user verifies email and logs in.
 
-  else if(page==='verify'){await backendApi.verifyEmail(email,String(f.get('code')));navigate('login');}
+  else if(page==='verify'){await backendApi.verifyEmail(email,String(f.get('code')));toast.success('تم تأكيد بريدك، تقدر تسجّل دخولك وتكمل ملفك.');navigate('login');}
   else if(page==='forgot'){await backendApi.forgotPassword(email);navigate('reset');}
   else if(page==='reset'){await backendApi.resetPassword({email,code:String(f.get('code')),newPassword:String(f.get('password'))});form.reset();navigate('login');}
   else{const account=await authenticate(email.trim(),String(f.get('password')));form.reset();onLogin(account);}
