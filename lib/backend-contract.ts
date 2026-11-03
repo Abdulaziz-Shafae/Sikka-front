@@ -2,7 +2,7 @@ import {apiRequest} from './sikka-api';
 import type {RidePriority,UiActivity,UiPlan} from './planning-ui';
 
 export type ApiRide={id:number;sourceRideId:string;name:string;status:'OPEN'|'CLOSED'|'UNAVAILABLE';waitMinutes:number|null;waitObservedAt:string|null;mapX:number|null;mapY:number|null};
-export type ApiMember={id:number;name:string;rsvpStatus:'GOING'|'MAYBE'|'NOT_GOING'|'INVITED';visitorProfileId:number|null};
+export type ApiMember={id:number;name:string;rsvpStatus:'GOING'|'NOT_GOING'|'INVITED';visitorProfileId:number|null};
 export type ApiPlanItem={id:number;activityKind:'RIDE'|'BREAK'|'PLACE'|'MEETING_POINT';rideId:number|null;placeId:number|null;title:string;relativeStartMinutes:number;relativeEndMinutes:number;walkingMinutes:number;waitingMinutes:number;activityMinutes:number;breakType:'MEAL'|'SNACK'|'PRAYER'|null;participantVisitMemberIds:number[]|string;startsAt:string|null;endsAt:string|null;priority:RidePriority|null;pinned:boolean;isRateable:boolean;sortOrder:number};
 export type ApiExcludedRide={rideId:number;rideName:string;visitMemberId:number;priority:RidePriority;reasonCode:string;reasonMessage:string};
 export type ApiPlanDetails={plan:{id:number;visitId:number;planKind:'GROUP'|'INDIVIDUAL';ownerVisitMemberId:number|null;timingMode:'RELATIVE'|'SCHEDULED';isActive:boolean};approvalStatus:'PENDING'|'APPROVED'|'REJECTED'|null;planItems:ApiPlanItem[];excludedRides:ApiExcludedRide[];proposedPlanItems:ApiPlanItem[];pendingProposal:null|{proposalKey:string;requestedByAccountId:number;requiredApproverAccountId:number;approvalScope:'GROUP'|'INDIVIDUAL';affectedMemberIds:number[]}};
