@@ -133,3 +133,19 @@ body{background:#f7f8fb}
 
 /* Keep carousel navigation opposite the ride category badge at every viewport width. */
 .ride-cover .carousel-controls{right:auto;left:12px;bottom:12px}
+
+
+/* Notification inbox: keep cards neutral, readable and compact. */
+.sikka-notification-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.sikka-notification-heading h1{margin:0}
+.sikka-notification-card{background:#fff;border:1px solid #dce5eb;border-radius:18px;padding:24px;margin-bottom:16px;box-shadow:0 2px 10px #14284b08}
+.sikka-notification-card-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.sikka-notification-card-head h2{display:flex;align-items:center;gap:9px;font-size:18px;line-height:1.65;margin:0;color:#142d4f;flex:1;min-width:190px}
+.sikka-notification-card-head h2 svg{flex:none;color:#53677f}
+.sikka-notification-new{display:inline-flex;align-items:center;border:1px solid #d7e3ee;border-radius:20px;background:#f5f8fb;color:#264469;padding:4px 11px;font-size:12px;font-weight:700}
+.sikka-notification-message{font-size:14px;line-height:1.9;color:#536477;margin:12px 0 15px;overflow-wrap:anywhere}
+.sikka-notification-timestamp{display:flex;align-items:center;gap:22px;flex-wrap:wrap;border-top:1px solid #e9eef3;padding-top:13px;color:#40546d;font-size:13px;font-weight:600}
+.sikka-notification-timestamp span{display:inline-flex;align-items:center;gap:7px}
+.sikka-notification-timestamp svg{color:#61778c;flex:none}
+.sikka-notification-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-start;margin-top:18px}
+@media(max-width:560px){.sikka-notification-card{padding:17px}.sikka-notification-card-head h2{font-size:16px}.sikka-notification-message{font-size:13px}.sikka-notification-timestamp{gap:14px}.sikka-notification-actions>button{flex:1;min-width:125px}}
