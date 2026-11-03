@@ -24,6 +24,19 @@ function load(name){if(cache[name])return cache[name];const out={};cache[name]=o
  response=url=>url.endsWith('/plans/8')?[{id:5,planKind:'GROUP',isActive:false},{id:4,planKind:'GROUP',isActive:true}]:{plan:{id:4}};await api.fetchVisiblePlan(visit,2);assert.equal(calls.at(-1).url,'/api/backend/api/v1/visit-plan/get/details/4');
  response={};await backend.suggestReplan(8,'تغير الانتظار',true);assert.deepEqual(JSON.parse(calls.at(-1).options.body),{reason:'تغير الانتظار',replaceUnavailableRides:true});await backend.reject(4,'proposal-123');assert.deepEqual(JSON.parse(calls.at(-1).options.body),{visitPlanId:4,proposalKey:'proposal-123'});assert.match(calls.at(-1).url,/\/plan-approval\/reject$/);
  await backend.mealPreferences(8,{choice:'ONE_MEAL',timings:['MIDDLE'],restaurantIds:[12]});assert.deepEqual(JSON.parse(calls.at(-1).options.body),{choice:'ONE_MEAL',timings:['MIDDLE'],restaurantIds:[12]});
+ // Testing point 07: the skip API must only be reachable from the confirmation dialog.
+ const planUi=fs.readFileSync(path.join(root,'components/sikka/live-plan.tsx'),'utf8');
+ assert.match(planUi,/onClick=\{\(\)=>setSkipConfirmation\(a\)\}>تخطَّ اللعبة/);
+ assert.match(planUi,/role="alertdialog"/);
+ assert.match(planUi,/onClick=\{\(\)=>setSkipConfirmation\(null\)\}>رجوع/);
+ assert.match(planUi,/onClick=\{\(\)=>\{void action\(skipConfirmation,'skip'\);\}\}/);
+ assert.doesNotMatch(planUi,/onClick=\{\(\)=>action\(a,'skip'\)\}/);
+ assert.match(planUi,/backendApi\.suggestReplan\(visit.id,reason\)/);
+ assert.match(planUi,/details\.plan\.isActive&&details\.approvalStatus==='APPROVED'/);
+ assert.match(planUi,/disabled=\{busy\|\|!!proposal\|\|!!dataError\}/);
+ assert.match(planUi,/رفضه يبقي الجدول الحالي/);
+ response={};await backend.suggestReplan(8,'أبي أرتاح شوي');assert.deepEqual(JSON.parse(calls.at(-1).options.body),{reason:'أبي أرتاح شوي',replaceUnavailableRides:false});
+ console.log('Passed skip confirmation wiring, replan request contract, and original-plan preservation copy.');
  const execution=load('lib/execution-ui');assert.deepEqual(execution.activityControls('UPCOMING',undefined,null,false),{start:true,complete:false,rate:false});assert.deepEqual(execution.activityControls('ACTIVE',{status:'ACTIVE'},null,false),{start:false,complete:true,rate:false});assert.deepEqual(execution.activityControls('COMPLETED',{status:'COMPLETED'},null,false),{start:false,complete:false,rate:true});assert.equal(execution.activityControls('COMPLETED',undefined,3,false).rate,false);assert.equal(execution.activityControls('COMPLETED',undefined,null,true).rate,false);assert.equal(execution.activityControls('SKIPPED',undefined,null,false).rate,false);const participants=[{id:1,visitorProfileId:7,rsvpStatus:'GOING'},{id:2,visitorProfileId:8,rsvpStatus:'GOING'},{id:3,visitorProfileId:null,rsvpStatus:'GOING'},{id:4,visitorProfileId:9,rsvpStatus:'NOT_GOING'}];assert.deepEqual(execution.completionParticipants([1,2,3,4],participants,1,'FRIENDS',false),[1,2]);assert.deepEqual(execution.completionParticipants([1,2,3],participants,1,'FAMILY',true),[1,3]);assert.deepEqual(execution.completionParticipants([1,2,3],participants,1,'FAMILY',false),[1]);assert.deepEqual(execution.completionParticipants([1,2,3],participants,1,'SOLO',true),[1]);
  const item={id:24};const records=[{id:7,planItemId:24,visitMemberId:10,status:'COMPLETED'}],sessions=[{id:18,planItemId:24,visitMemberId:11,status:'ACTIVE'}];assert.equal(api.executionState(item.id,10,records,sessions).status,'COMPLETED');assert.equal(api.executionState(item.id,11,records,sessions).status,'ACTIVE');assert.equal(api.executionState(item.id,12,records,sessions).status,'UPCOMING');
  await backend.completeRide(8,{requestKey:'complete-10-24',rideId:84,planItemId:24,visitMemberIds:[10]});assert.match(calls.at(-1).url,/\/visit-record\/complete\/8$/);assert.equal(JSON.parse(calls.at(-1).options.body).status,undefined);
