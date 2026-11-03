@@ -15,4 +15,20 @@ assert.deepEqual(api.participantIds('[12,13]'),[12,13]);assert.throws(()=>api.pa
 const item={id:1,activityKind:'RIDE',rideId:84,placeId:null,title:'Real ride',relativeStartMinutes:0,relativeEndMinutes:23,walkingMinutes:0,waitingMinutes:15,activityMinutes:8,breakType:null,participantVisitMemberIds:'[12]',startsAt:null,endsAt:null,priority:'MUST_RIDE',pinned:false,isRateable:false,sortOrder:0};const details={plan:{id:1,visitId:1,planKind:'GROUP',ownerVisitMemberId:null,timingMode:'RELATIVE',isActive:true},approvalStatus:'APPROVED',planItems:[item],excludedRides:[],proposedPlanItems:[],pendingProposal:null};const real=api.normalizeStoredPlan(details,catalog,[{id:12,name:'Visitor'}]);assert.equal(real.source,'SERVER');assert.equal(real.activities[0].rideSlug,selected[0]);assert.equal(Object.keys(real.activities[0].records).length,0);assert.throws(()=>api.normalizeStoredPlan({...details,planItems:[{...item,relativeEndMinutes:24}]},catalog,[{id:12,name:'Visitor'}]));
 console.log('Passed priorities, exclusions, capacity, split isolation, food timing, proposal approvals, participant records, repeat resets and backend ID/timing contracts.');
 
+// Testing point 06: copy-only regression checks; status refresh must not trigger another generation request.
+const feedback=load('lib/plan-feedback');
+assert.match(feedback.generationFeedback('PROCESSING'),/بدون إرسال طلب توليد جديد/);
+assert.match(feedback.generationFeedback('SUCCEEDED'),/مراجعتها واعتمادها/);
+assert.match(feedback.generationFeedback('FAILED'),/راجع متطلبات الزيارة/);
+assert.match(feedback.generationFeedback('FAILED','  خدمة غير متاحة  '),/خدمة غير متاحة/);
+assert.doesNotMatch(feedback.generationFeedback('FAILED','  خدمة غير متاحة  '),/  خدمة غير متاحة  /);
+assert.match(feedback.rejectedPlanFeedback,/إعادة توليد/);
+const sikkaScreen=fs.readFileSync(path.join(root,'components/sikka/live-sikka.tsx'),'utf8');
+const planScreen=fs.readFileSync(path.join(root,'components/sikka/live-plan.tsx'),'utf8');
+assert.match(sikkaScreen,/generationFeedback\(generation.status,generation.reason\)/);
+assert.match(sikkaScreen,/generation.status==='PROCESSING'&&<Button[^>]*onClick=\{checkGeneration\}/);
+assert.match(planScreen,/approvalStatus==='REJECTED'&&leader&&<div/);
+assert.match(planScreen,/location.hash=`visit\/\$\{visit.id\}\/preview`/);
+console.log('Passed generation status messages, manual-only status refresh and rejected-plan guidance.');
+
 const finish=load('lib/demo-generation').finishDemoGeneration;const transitions=[];finish({...v,approved:false},patch=>transitions.push(patch),page=>transitions.push(page));assert.equal(transitions[0].status,'GENERATED');assert.ok(transitions[0].planning.activities);assert.equal(transitions[1],'plan');const approvedTransitions=[];finish({...v,approved:true},patch=>approvedTransitions.push(patch),page=>approvedTransitions.push(page));assert.deepEqual(approvedTransitions,['plan']);console.log('Passed generation transition to plan and approved-plan preservation.');
