@@ -37,6 +37,20 @@ function load(name){if(cache[name])return cache[name];const out={};cache[name]=o
  assert.match(planUi,/رفضه يبقي الجدول الحالي/);
  response={};await backend.suggestReplan(8,'أبي أرتاح شوي');assert.deepEqual(JSON.parse(calls.at(-1).options.body),{reason:'أبي أرتاح شوي',replaceUnavailableRides:false});
  console.log('Passed skip confirmation wiring, replan request contract, and original-plan preservation copy.');
+ // Testing point 08: prayer names are taken only from the stored plan, not guessed from time of day.
+ const prayerUi=load('lib/prayer-presentation');
+ const asr={title:'صلاة العصر',breakType:'PRAYER',startsAt:'2026-11-05T15:25:00',walkingMinutes:5,placeId:7};
+ const prayerRooms=[{id:7,name:'مصلى الواحة',kind:'PRAYER_ROOM'}];
+ assert.deepEqual(prayerUi.prayerPresentation(asr,prayerRooms),{name:'صلاة العصر',time:'15:30',room:'مصلى الواحة',confirmed:true});
+ assert.deepEqual(prayerUi.prayerPresentation({...asr,title:'بريك صلاة',startsAt:null},prayerRooms),{name:'وقت صلاة',time:null,room:'مصلى الواحة',confirmed:false});
+ assert.deepEqual(prayerUi.prayerPresentation({...asr,placeId:99},prayerRooms),{name:'صلاة العصر',time:'15:30',room:null,confirmed:true});
+ assert.equal(prayerUi.prayerPresentation({...asr,breakType:'SNACK'},prayerRooms),null);
+ assert.match(prayerUi.provisionalPrayerMessage,/تؤكد وقت الوصول/);
+ const prayerScreen=fs.readFileSync(path.join(root,'components/sikka/live-plan.tsx'),'utf8');
+ assert.match(prayerScreen,/prayerPresentation\(a,places\)/);
+ assert.match(prayerScreen,/prayer\.confirmed\?/);
+ assert.match(prayerScreen,/visit\.includePrayer&&!visit\.plannedStartTime/);
+ console.log('Passed confirmed prayer label, actual prayer start, prayer room lookup, and provisional-time handling.');
  const execution=load('lib/execution-ui');assert.deepEqual(execution.activityControls('UPCOMING',undefined,null,false),{start:true,complete:false,rate:false});assert.deepEqual(execution.activityControls('ACTIVE',{status:'ACTIVE'},null,false),{start:false,complete:true,rate:false});assert.deepEqual(execution.activityControls('COMPLETED',{status:'COMPLETED'},null,false),{start:false,complete:false,rate:true});assert.equal(execution.activityControls('COMPLETED',undefined,3,false).rate,false);assert.equal(execution.activityControls('COMPLETED',undefined,null,true).rate,false);assert.equal(execution.activityControls('SKIPPED',undefined,null,false).rate,false);const participants=[{id:1,visitorProfileId:7,rsvpStatus:'GOING'},{id:2,visitorProfileId:8,rsvpStatus:'GOING'},{id:3,visitorProfileId:null,rsvpStatus:'GOING'},{id:4,visitorProfileId:9,rsvpStatus:'NOT_GOING'}];assert.deepEqual(execution.completionParticipants([1,2,3,4],participants,1,'FRIENDS',false),[1,2]);assert.deepEqual(execution.completionParticipants([1,2,3],participants,1,'FAMILY',true),[1,3]);assert.deepEqual(execution.completionParticipants([1,2,3],participants,1,'FAMILY',false),[1]);assert.deepEqual(execution.completionParticipants([1,2,3],participants,1,'SOLO',true),[1]);
  const item={id:24};const records=[{id:7,planItemId:24,visitMemberId:10,status:'COMPLETED'}],sessions=[{id:18,planItemId:24,visitMemberId:11,status:'ACTIVE'}];assert.equal(api.executionState(item.id,10,records,sessions).status,'COMPLETED');assert.equal(api.executionState(item.id,11,records,sessions).status,'ACTIVE');assert.equal(api.executionState(item.id,12,records,sessions).status,'UPCOMING');
  await backend.completeRide(8,{requestKey:'complete-10-24',rideId:84,planItemId:24,visitMemberIds:[10]});assert.match(calls.at(-1).url,/\/visit-record\/complete\/8$/);assert.equal(JSON.parse(calls.at(-1).options.body).status,undefined);
