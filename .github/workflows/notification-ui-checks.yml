@@ -4,6 +4,10 @@ on:
     branches:
       - feature/notification-card-time-design
       - feature/notifications-approved-20261103
+  pull_request:
+    branches:
+      - feature/notification-card-time-design
+      - main
   workflow_dispatch:
 
 jobs:
