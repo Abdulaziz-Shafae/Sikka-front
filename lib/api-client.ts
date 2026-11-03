@@ -3,12 +3,11 @@ let sessionKnown=false;
 export class SikkaApiError extends Error {
  constructor(message:string,public status:number){super(message);this.name='SikkaApiError';}
 }
-export const apiConfigured=()=>!!process.env.NEXT_PUBLIC_SIKKA_API_URL;
+export const apiConfigured=()=>true; // Same-origin Railway proxy uses /api/v1.
 export function clearAuthentication(){sessionKnown=false;}
 export function hasAuthentication(){return sessionKnown;}
 function apiUrl(path:string){
- const base=process.env.NEXT_PUBLIC_SIKKA_API_URL?.replace(/\/$/,'');
- if(!base)throw new Error('لم يتم ضبط اتصال سكة بالخادم');
+ const base=process.env.NEXT_PUBLIC_SIKKA_API_URL?.replace(/\/$/,'')||'';
  if(!path.startsWith('/api/v1/'))throw new Error('مسار الخدمة غير صالح');
  return base+path;
 }
