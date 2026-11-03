@@ -25,6 +25,7 @@ import {Field,MealPreferences,PersonForm,RidePreferences,VisitForm,type Mutate} 
 import {LivePlan} from './live-plan';
 import {LiveAdmin} from './live-admin';
 import {Checkout} from './checkout';
+import {LiveAccountDeletion} from './live-account-deletion';
 type Bundle={visit:LiveVisit;members:Member[];preview:PlanningPreview};
 function missingLabel(field:string){if(field.startsWith('meal:'))return field.slice(5);if(field.includes('planningAnswers'))return 'إجابات أحد المشاركين لم تكتمل';if(field.includes('meal'))return 'حدد تفضيلات الأكل';return ({durationMinutes:'حدد مدة الزيارة',primaryGoal:'حدد هدف الزيارة',goals:'حدد هدف الزيارة',tripType:'حدد نوع الزيارة',visitDate:'حدد تاريخ الزيارة'} as Record<string,string>)[field]||'راجع بيانات الزيارة والمشاركين';}
 const labels:Record<string,string>={DRAFT:'مسودة',PLANNING:'قيد التخطيط',READY:'جاهزة',IN_PROGRESS:'بدأت',COMPLETED:'مكتملة',CANCELLED:'ملغاة',GOING:'حاضر',MAYBE:'يمكن',NOT_GOING:'لن يحضر',INVITED:'مدعو'};
