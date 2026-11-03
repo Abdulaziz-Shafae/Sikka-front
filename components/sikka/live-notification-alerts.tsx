@@ -7,12 +7,20 @@ import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {backendApi,type ApiPlanDetails} from '@/lib/backend-contract';
 import {liveApi,request,type Notice,type Place} from '@/lib/live-api';
+import {SikkaApiError} from '@/lib/api-client';
 
 const reasons=[['rest','أخذنا راحة'],['wait','انتظار أطول'],['extra','لعبة خارج الخطة'],['other','سبب ثاني']] as const;
 const cuisines=[['burger','برجر'],['pizza','بيتزا'],['chicken','دجاج'],['grill','مشاوي'],['light','شي خفيف'],['any','أي شيء']] as const;
 const mealKeywords:Record<string,RegExp>={
  burger:/برجر|burger/i,pizza:/بيتزا|pizza/i,chicken:/دجاج|chicken/i,
  grill:/مشاوي|grill|barbecue|bbq|كباب/i,light:/سلطة|salad|light|خفيف/i
+};
+const cuisineCodes:Record<string,string[]>={
+ burger:['NORTH_AMERICAN','MULTINATIONAL'],
+ pizza:['ITALIAN'],
+ chicken:['NORTH_AMERICAN','INDIAN','MULTINATIONAL'],
+ grill:['MIDDLE_EASTERN'],
+ light:['MULTINATIONAL','MIDDLE_EASTERN']
 };
 function isInteractive(n:Notice){return !n.respondedAt&&['ACTIVITY_DELAY','REPLAN_APPROVAL_REQUEST','MEAL_RESTAURANT_REMINDER'].includes(n.type);}
 function isMajorRide(n:Notice){return n.actionType==='RIDE_CLOSED'||n.actionType==='RIDE_WAIT_MAJOR';}
@@ -87,7 +95,7 @@ export function LiveNotificationAlerts({accountId,onVisit}:{accountId:number;onV
   const [meals,places,plan,rides]=await Promise.all([liveApi.mealBreaks(visitId),liveApi.places(),liveApi.groupPlan(visitId),liveApi.rides()]);
   const meal=meals.find(m=>m.planItemId===current.planItemId&&!m.placeId);
   if(!meal)throw new Error('تم اختيار مطعم من قبل، أو انتهى وقت اختيار المطعم.');
-  const matching=places.filter(p=>p.kind==='RESTAURANT'&&p.status==='OPEN'&&(cuisine==='any'||mealKeywords[cuisine]?.test(p.name+' '+(p.description||''))));
+  const matching=places.filter(p=>p.kind==='RESTAURANT'&&p.status==='OPEN'&&(cuisine==='any'||mealKeywords[cuisine]?.test(p.name+' '+(p.description||''))||p.cuisineTypes?.some(code=>(cuisineCodes[cuisine]||[]).includes(code))));
   if(!matching.length)throw new Error('ما لقينا مطعمًا مفتوحًا ومؤكدًا لهذا النوع. اختَر نوعًا ثانيًا أو ابحث يدويًا.');
   const food=plan.planItems.find(a=>a.id===meal.planItemId);
   const before=plan.planItems.filter(a=>a.rideId&&food&&a.sortOrder<food.sortOrder).sort((a,b)=>b.sortOrder-a.sortOrder)[0];
@@ -101,7 +109,14 @@ export function LiveNotificationAlerts({accountId,onVisit}:{accountId:number;onV
   };
   matching.sort((a,b)=>score(a)-score(b)||a.id-b.id);
   // Final timetable, walking-route availability and shared-party permissions are verified by Spring Boot.
-  await liveApi.restaurant(visitId,meal.breakKey,matching[0].id);
+  let chosen=false;
+  // A restaurant with a matching cuisine can still lack a verified route or fit poorly in the schedule.
+  // Only those server-validated failures trigger the next nearby candidate.
+  for(const option of matching.slice(0,8)){
+   try{await liveApi.restaurant(visitId,meal.breakKey,option.id);chosen=true;break;}
+   catch(error){if(!(error instanceof SikkaApiError&&error.status===400))throw error;}
+  }
+  if(!chosen)throw new Error('ما لقينا مطعمًا مناسبًا يطابق المسار والوقت. اختَر نوعًا ثانيًا أو حدد مطعمًا يدويًا.');
   await markRead();
  }
  async function applyRideAction(action:'DEFER'|'REPLACE'|'KEEP'|'ADJUST') {
