@@ -37,7 +37,7 @@ export function LiveNotificationAlerts({accountId,onVisit}:{accountId:number;onV
    try{
     const notices=await liveApi.notices();
     if(!live)return;
-    const fresh=notices.filter(n=>n.actionType==='RIDE_WAIT_MINOR'&&!n.readAt&&!seen.current.has(n.id));
+    const fresh=notices.filter(n=>!n.readAt&&!seen.current.has(n.id)&&(n.actionType==='RIDE_WAIT_MINOR'||['PLAN_APPROVAL_RESULT','REPLAN_RESULT','ALL_MEMBERS_RESPONDED'].includes(n.type)));
     if(initialized.current)for(const n of fresh)toast.info(n.title||'تغير وقت انتظار لعبة',{description:n.message});
     for(const n of notices)seen.current.add(n.id);
     initialized.current=true;
