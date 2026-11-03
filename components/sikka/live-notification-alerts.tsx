@@ -104,17 +104,12 @@ export function LiveNotificationAlerts({accountId,onVisit}:{accountId:number;onV
   await liveApi.restaurant(visitId,meal.breakKey,matching[0].id);
   await markRead();
  }
- async function applyAutomaticReplan(replace:boolean){
-  if(!current?.visitId)throw new Error('هذا التنبيه غير مرتبط بزيارة.');
-  const result=await backendApi.suggestReplan(current.visitId,
-   replace?'تعديل بعد إغلاق اللعبة أو زيادة الانتظار':'مراجعة الجدول بعد زيادة الانتظار',replace) as {visitPlanId:number;proposalKey:string;requiredApproverAccountId:number};
-  if(result.requiredApproverAccountId===accountId){
-   await backendApi.approve(result.visitPlanId,result.proposalKey);
-   toast.success('تم اعتماد التعديل على الخطة');
-  }else{
-   toast.info('وصل طلب التعديل لصاحب صلاحية الاعتماد');
-  }
-  await markRead();
+ async function applyRideAction(action:'DEFER'|'REPLACE'|'KEEP'|'ADJUST') {
+  if(!current)throw new Error('التنبيه غير موجود.');
+  const response=await request<{message:string}>(`notification/ride-action/${current.id}/${action}`,'PUT');
+  toast.success(response.message||'تم تحديث سكتكم');
+  setItems(items=>items.map(n=>n.id===current.id?{...n,readAt:new Date().toISOString(),respondedAt:new Date().toISOString()}:n));
+  if(current.visitId)onVisit(current.visitId);
  }
  return <Dialog open={!!current} onOpenChange={open=>{if(!open)close();}}>
   <DialogContent dir="rtl" className="max-h-[85vh] overflow-y-auto" showCloseButton={!busy}>
@@ -137,13 +132,13 @@ export function LiveNotificationAlerts({accountId,onVisit}:{accountId:number;onV
     <Button className="col-span-3" disabled={busy||!cuisine} onClick={()=>void run(selectRestaurant)}>اختَر لنا مطعمًا</Button>
    </div>}
    {current?.type==='RIDE_STATUS_CHANGED'&&<div className="grid grid-cols-2 gap-2">
-    <Button variant="outline" disabled={busy} onClick={()=>{if(current.visitId)onVisit(current.visitId);close();}}>نروح للي بعدها — راجع الخطة</Button>
-    <Button disabled={busy} onClick={()=>void run(()=>applyAutomaticReplan(true))}>اختَر بديل تلقائيًا</Button>
+    <Button variant="outline" disabled={busy} onClick={()=>void run(()=>applyRideAction('DEFER'))}>نروح للي بعدها</Button>
+    <Button disabled={busy} onClick={()=>void run(()=>applyRideAction('REPLACE'))}>اختَر بديل تلقائيًا</Button>
    </div>}
    {current?.actionType==='RIDE_WAIT_MAJOR'&&<div className="grid gap-2">
-    <Button variant="outline" disabled={busy} onClick={()=>void run(markRead)}>نكمل نفس الخطة</Button>
-    <Button disabled={busy} onClick={()=>void run(()=>applyAutomaticReplan(true))}>نبدّل اللعبة</Button>
-    <Button variant="outline" disabled={busy} onClick={()=>{if(current.visitId)onVisit(current.visitId);close();}}>نعدّل الخطة — راجع المقترح</Button>
+    <Button variant="outline" disabled={busy} onClick={()=>void run(()=>applyRideAction('KEEP'))}>نكمل نفس الخطة</Button>
+    <Button disabled={busy} onClick={()=>void run(()=>applyRideAction('REPLACE'))}>نبدّل اللعبة</Button>
+    <Button variant="outline" disabled={busy} onClick={()=>void run(()=>applyRideAction('ADJUST'))}>نعدّل الخطة</Button>
    </div>}
    <Button type="button" variant="ghost" disabled={busy} onClick={close}>مو الحين</Button>
   </DialogContent>
