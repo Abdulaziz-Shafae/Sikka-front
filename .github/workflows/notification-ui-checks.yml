@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - feature/notification-card-time-design
+      - feature/notifications-approved-20261103
   workflow_dispatch:
 
 jobs:
