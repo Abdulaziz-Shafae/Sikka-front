@@ -11,10 +11,10 @@ function apiUrl(path:string){
  if(!path.startsWith('/api/v1/'))throw new Error('مسار الخدمة غير صالح');
  return base+path;
 }
-export async function apiResponse(path:string,method='GET',body?:unknown){
+export async function apiResponse(path:string,method='GET',body?:unknown,accept='application/json'){
  const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),120000);
  try{
-  const response=await fetch(apiUrl(path),{method,credentials:'include',cache:'no-store',signal:controller.signal,headers:{Accept:'application/json',...(body!==undefined?{'Content-Type':'application/json'}:{})},body:body!==undefined?JSON.stringify(body):undefined});
+  const response=await fetch(apiUrl(path),{method,credentials:'include',cache:'no-store',signal:controller.signal,headers:{Accept:accept,...(body!==undefined?{'Content-Type':'application/json'}:{})},body:body!==undefined?JSON.stringify(body):undefined});
   if(!response.ok){const value=await response.json().catch(()=>null);if(response.status===401)clearAuthentication();throw new SikkaApiError((value&&typeof value==='object'&&'message' in value?String(value.message):'')||(response.status===401?'سجل دخولك لإكمال الطلب':'تعذر إكمال الطلب'),response.status);}
   return response;
  }catch(error){if(error instanceof Error&&error.name==='AbortError')throw new Error('انتهت مهلة الاتصال. حدّث حالة الطلب قبل المحاولة مجددًا.');throw error;}finally{clearTimeout(timeout);}
