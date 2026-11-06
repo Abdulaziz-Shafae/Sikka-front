@@ -38,7 +38,6 @@ function RideCard({ride,x,y}:{ride:PosterRide;x:number;y:number}){
    <text x={x+137} y={y+102} direction="rtl" fontFamily="Arial,sans-serif" fontSize="15" fontWeight="700" fill={blue} textAnchor="middle">🏆 رقم قياسي عالمي</text>
    {label.map((s,i)=><text x={x+137} y={y+122+i*15} direction="rtl" fontSize="14" fontWeight="700" fill={blue} textAnchor="middle" key={i}>{s}</text>)}
    </g>}
-  {!label&&ride.time&&<text x={x+137} y={y+123} fontFamily="Arial,sans-serif" fontSize="21" fill={blue} textAnchor="middle" direction="ltr">{ride.time}</text>}
  </g>;
 }
 export function VisitSummaryPoster({rides,visitName,visitDate,pageIndex=0}:{rides:PosterRide[];visitName:string;visitDate:string;pageIndex?:number}){
@@ -92,7 +91,6 @@ export function VisitSummaryPoster({rides,visitName,visitDate,pageIndex=0}:{ride
    <path d="M160 691 v-52" stroke={blue} strokeWidth="7"/><path d="M160 639 l58 16 -58 17z" fill={blue}/>
    {positions.map((x,i)=>rides[i]?<g key={i}><RideCard x={x} y={292} ride={rides[i]}/><Cart x={x+85} y={472} direction="right"/><circle cx={x+137} cy={515} r="15" stroke="#0958b5" strokeWidth="6" fill="#fff"/></g>:null)}
    {positions.map((x,i)=>rides[i+4]?<g key={i}><RideCard x={x} y={571} ride={rides[i+4]}/><Cart x={x+85} y={747} direction="left"/><circle cx={x+137} cy={785} r="15" stroke="#0958b5" strokeWidth="6" fill="#fff"/></g>:null)}
-   <text x="800" y="877" textAnchor="middle" fontSize="17" fill={blue} opacity=".7" fontFamily="Arial,sans-serif">{visitDate} · {visitName.slice(0,50)}</text>
   </svg>
   <div className="readiness-actions"><Button type="button" disabled={saving} onClick={()=>void savePng()}>{saving?'نجهز الصورة…':'احفظ ملخص سكتك كصورة'}</Button></div>
   {error&&<p role="alert">{error}</p>}
