@@ -28,7 +28,7 @@ assert.match(preview,/tabIndex=\{0\}/);
 assert.match(css,/\.sikka-poster-preview>svg\{width:900px!important/);
 assert.match(css,/\.map-selection-actions button\[data-slot=button\]\{min-height:44px/);
 assert.match(css,/\.map-controls button\{min-width:44px;min-height:44px/);
-assert.match(css,/\[role="dialog"\]\.readiness-panel\{max-height:calc\(100dvh - 32px\)/);
+assert.match(css,/\[role="dialog"\]\.readiness-panel,\[role="alertdialog"\]\.readiness-panel\{max-height:calc\(100dvh - 32px\)/);
 assert.match(map,/aria-label="تحديد موقعي"/);
 assert.match(map,/وجهني لها/);
 assert.match(preview,/viewBox="0 0 1600 900"/);
