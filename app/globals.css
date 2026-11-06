@@ -216,3 +216,34 @@ body,body *{font-family:var(--font-sans)!important}
 .profile-page>.readiness-actions{margin-top:20px}
 .hero-profile-prompt{align-items:center;color:var(--yellow);text-shadow:0 2px 8px #041437}
 .hero-profile-prompt>a{color:var(--yellow)}
+
+/* Testing point 12: preview-only zoom; original approved 1600x900 SVG and PNG export stay untouched. */
+.sikka-poster-preview{width:100%;max-width:100%;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;border-radius:16px;scrollbar-gutter:stable}
+.sikka-poster-preview:focus-visible{outline:3px solid #0b2e8b;outline-offset:3px}
+.sikka-poster-preview>svg{display:block;width:100%;height:auto;max-width:none}
+@media(max-width:700px){.sikka-poster-preview>svg{width:900px!important;max-width:none!important}}
+/* Modal panels scroll within the viewport, including on phones with a visible keyboard. */
+[role="dialog"].readiness-panel,[role="alertdialog"].readiness-panel{max-height:calc(100dvh - 32px);overflow-y:auto;overscroll-behavior:contain}
+[role="dialog"].readiness-panel:focus-visible,[role="alertdialog"].readiness-panel:focus-visible{outline:3px solid #0b2e8b;outline-offset:3px}
+/* Map navigation controls remain separate from pins and always have accessible touch areas. */
+.map-controls{max-width:calc(100% - 24px);overflow:visible}
+.map-controls button{min-width:44px;min-height:44px;width:auto;padding-inline:10px;white-space:nowrap;background:#fff}
+.map-selection-actions{flex-wrap:wrap;min-width:0}
+.map-selection-actions button[data-slot=button]{min-height:44px;height:auto;white-space:normal}
+@media(max-width:700px){
+ .map-toolbar{height:auto;min-height:56px;flex-wrap:wrap;align-items:center}
+ .map-toolbar .map-layers{width:100%;flex-wrap:wrap}
+ .map-toolbar .map-layers button{min-height:44px;flex:1 1 auto;justify-content:center}
+ .map-plan-toggle{min-height:44px}
+ .map-route-planner{flex-wrap:wrap;padding:12px}
+ .map-route-planner>label{flex:1 1 130px}
+ .map-route-planner>button{min-height:44px}
+ .map-controls{top:8px;left:8px}
+ .map-selection{gap:10px;padding:12px}
+ .map-selection-actions{width:100%;margin-inline-start:0}
+ .map-selection-actions button[data-slot=button]{flex:1 1 135px}
+ .walking-summary{flex-wrap:wrap;padding:12px}
+ .walking-summary>button,.walking-summary button[data-slot=button]{min-height:44px}
+ .map-itinerary button{min-height:44px}
+ .map-viewport{min-height:310px}
+}
