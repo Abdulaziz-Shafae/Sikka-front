@@ -3,7 +3,7 @@ import {useRef,useState} from 'react';
 import {Button} from '@/components/ui/button';
 import type {PosterRide} from '@/lib/visit-poster';
 
-const blue='#07358b',red='#ed1c2e',light='#d7ecff';
+const blue='#07358b',red='#ed1c2e';
 const recordLines:Record<string,string[]>={
  'الأطول والأسرع والأعلى عالميًا':['الأطول والأسرع والأعلى','عالميًا'],
  'أعلى Tilt Coaster عالميًا':['أعلى Tilt Coaster','عالميًا'],
