@@ -72,6 +72,7 @@ export function VisitSummaryPoster({rides,visitName,visitDate,pageIndex=0}:{ride
  // Approved artwork geometry is constant; only database-backed ride labels and counts change.
  const positions=[237,547,857,1167];
  return <section className="readiness-panel" aria-label="ملخص ألعاب الزيارة">
+  <div className="sikka-poster-preview" role="region" aria-label="معاينة صورة الملخص، مرر أفقيًا لتكبير التفاصيل" tabIndex={0} dir="ltr">
   <svg ref={svgRef} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label={`ملخص ${visitName}: ${rides.length} ألعاب مكتملة`} style={{width:'100%',height:'auto',display:'block',background:'#fff',borderRadius:16}}>
    <defs><linearGradient id="sikka-poster-sky" x1="0" y1="0" x2="0" y2="1"><stop stopColor="#e9f5ff"/><stop offset=".43" stopColor="#fff"/><stop offset="1" stopColor="#fff"/></linearGradient></defs>
    <rect width="1600" height="900" fill="url(#sikka-poster-sky)"/>
@@ -92,6 +93,7 @@ export function VisitSummaryPoster({rides,visitName,visitDate,pageIndex=0}:{ride
    {positions.map((x,i)=>rides[i]?<g key={i}><RideCard x={x} y={292} ride={rides[i]}/><Cart x={x+85} y={472} direction="right"/><circle cx={x+137} cy={515} r="15" stroke="#0958b5" strokeWidth="6" fill="#fff"/></g>:null)}
    {positions.map((x,i)=>rides[i+4]?<g key={i}><RideCard x={x} y={571} ride={rides[i+4]}/><Cart x={x+85} y={747} direction="left"/><circle cx={x+137} cy={785} r="15" stroke="#0958b5" strokeWidth="6" fill="#fff"/></g>:null)}
   </svg>
+  </div>
   <div className="readiness-actions"><Button type="button" disabled={saving} onClick={()=>void savePng()}>{saving?'نجهز الصورة…':'احفظ ملخص سكتك كصورة'}</Button></div>
   {error&&<p role="alert">{error}</p>}
  </section>;
