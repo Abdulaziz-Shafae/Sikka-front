@@ -59,6 +59,7 @@ export const backendApi={
  review:(id:number,dto:unknown)=>apiRequest(`/api/v1/visit-member/review/${positive(id)}`,'PUT',dto),
  reuse:(id:number,visitDate:string)=>apiRequest(`/api/v1/visit/reuse/${positive(id)}`,'POST',{visitDate}),
  progress:(id:number)=>apiRequest(`/api/v1/visit-record/progress/${positive(id)}`),
+ visitSummary:(id:number)=>apiRequest(`/api/v1/visit-record/visit-summary/${positive(id)}`) as Promise<{visitId:number;visitMemberId:number;completedRidesCount:number;uniqueCompletedRidesCount:number;repeatedRidesCount:number;skippedRidesCount:number}>,
  paymentOrders:(id:number)=>apiRequest(`/api/v1/payment-order/get/visit/${positive(id)}`),
  createOrder:(id:number)=>apiRequest(`/api/v1/payment-order/add/${positive(id)}`,'POST'),
  confirmPayment:(id:number,paymentId:string)=>apiRequest(`/api/v1/payment-order/confirm/${positive(id)}`,'POST',{paymentId}),
