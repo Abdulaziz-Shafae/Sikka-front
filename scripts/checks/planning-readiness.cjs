@@ -56,5 +56,8 @@ assert.match(mapSource,/gpsFix&&guidingRide\?routeFromGpsToRide/);
 assert.match(mapSource,/وجهني لها/);
 assert.match(mapSource,/onClick=\{stopLocation\}/);
 assert.match(mapSource,/itinerary.filter\(a=>a.key===m.id/);
+assert.match(mapSource,/itinerary.some\(item=>item.key===m.id\)/);
+assert.ok(mapSource.indexOf('gpsRoute&&<svg')>mapSource.indexOf('className={`map-routes'));
+assert.match(mapSource,/gpsCentered.current=true;map.zoomToPoints/);
 console.log('Passed GPS accuracy/out-of-park guards, walkway mapping, route endpoint, controls and activity numbering.');
 const finish=load('lib/demo-generation').finishDemoGeneration;const transitions=[];finish({...v,approved:false},patch=>transitions.push(patch),page=>transitions.push(page));assert.equal(transitions[0].status,'GENERATED');assert.ok(transitions[0].planning.activities);assert.equal(transitions[1],'plan');const approvedTransitions=[];finish({...v,approved:true},patch=>approvedTransitions.push(patch),page=>approvedTransitions.push(page));assert.deepEqual(approvedTransitions,['plan']);console.log('Passed generation transition to plan and approved-plan preservation.');
