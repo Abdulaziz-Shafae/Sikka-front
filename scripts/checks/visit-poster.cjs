@@ -2,7 +2,7 @@ const fs=require('node:fs'),path=require('node:path'),assert=require('node:asser
 const root=path.resolve(__dirname,'../..');
 const source=fs.readFileSync(path.join(root,'lib/visit-poster.ts'),'utf8');
 const out={};new Function('exports',ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText)(out);
-const rides=[{id:17,sourceRideId:'falcons-flight'},{id:22,sourceRideId:'adrena-line'}];
+const rides=[{id:17,sourceRideId:'falcons-flight',rideFeatures:['RECORD_BREAKING','ROLLER_COASTER']},{id:22,sourceRideId:'adrena-line',rideFeatures:['FAMILY']}];
 const data=[
  {id:2,rideId:17,rideName:'Falcons Flight',visitMemberId:8,status:'COMPLETED',completedAt:'2026-11-06T19:04:00'},
  {id:1,rideId:22,rideName:'Adrena-Line',visitMemberId:8,status:'COMPLETED',completedAt:'2026-11-06T18:45:00'},
@@ -15,6 +15,7 @@ assert.equal(selected[0].name,'Adrena-Line');
 assert.equal(selected[1].name,'Falcons Flight');
 assert.equal(selected[1].recordLabel,'الأطول والأسرع والأعلى عالميًا');
 assert.equal(selected[0].recordLabel,null);
+assert.equal(out.completedPosterRides(data,[{...rides[0],rideFeatures:[]},rides[1]],8)[1].recordLabel,null);
 assert.equal(selected[0].time,'18:45');
 assert.equal(out.completedPosterRides(data,rides,12).length,1);
 assert.deepEqual(out.posterPages(Array.from({length:18},(_,i)=>i)).map(p=>p.length),[8,8,2]);
