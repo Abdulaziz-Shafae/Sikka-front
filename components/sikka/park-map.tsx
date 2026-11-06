@@ -44,13 +44,15 @@ export function ParkMap({ compact = false, onRide, itinerary=[],focusedKey,onAct
   const [origin, setOrigin] = useState('iron-rattler'), [destination, setDestination] = useState('gearworks-eatery');
   const [gpsFix,setGpsFix]=useState<SnappedLocation|null>(null),[gpsMessage,setGpsMessage]=useState(''),[guidingRide,setGuidingRide]=useState<string|null>(null);
   const gpsWatch=useRef<number|null>(null);
+  const gpsCentered=useRef(false);
   useEffect(()=>()=>{if(gpsWatch.current!==null&&typeof navigator!=='undefined'&&navigator.geolocation)navigator.geolocation.clearWatch(gpsWatch.current);},[]);
 
   const selectedItem = mapItems.find(m => m.id === selected)!;
   const selectedRide = rides.find(r => r.slug === selected);
   const route = useMemo(() => routing ? findRoute(origin, destination) : null, [routing, origin, destination]);
   const gpsRoute=useMemo(()=>gpsFix&&guidingRide?routeFromGpsToRide(gpsFix,guidingRide):null,[gpsFix,guidingRide]);
-  const markers = mapPositions.filter(m => m.kind === layerKinds[layer]&&(layer!=='places'||!foodFilters.length||restaurants.some(p=>p.name.toLowerCase()===m.name.toLowerCase()&&p.cuisineTypes.some(c=>foodFilters.includes(c)))));
+  // Plan stops stay visible across categories; exploration filters apply only to non-plan locations.
+  const markers = mapPositions.filter(m => itinerary.some(item=>item.key===m.id)||(m.kind===layerKinds[layer]&&(layer!=='places'||!foodFilters.length||restaurants.some(p=>p.name.toLowerCase()===m.name.toLowerCase()&&p.cuisineTypes.some(c=>foodFilters.includes(c))))));
   const nextKey=itinerary.find(a=>!a.completed)?.key;
   useEffect(()=>{const next=mapPositions.find(m=>m.id===nextKey);if(!next||!map.size.width||!map.size.height)return;setSelected(next.id);const target=layers.find(l=>layerKinds[l.id]===next.kind);if(target)setLayer(target.id);map.zoomToPoints([next]);setExpandedCluster([]);},[nextKey,!!map.size.width,!!map.size.height]);
   const highlightedKey=nextKey||(!itinerary.length?focusedKey:undefined);
@@ -88,10 +90,11 @@ export function ParkMap({ compact = false, onRide, itinerary=[],focusedKey,onAct
       const fix=snapGpsToPath(position.coords.latitude,position.coords.longitude,position.coords.accuracy);
       if(!fix){setGpsFix(null);setGpsMessage('الموقع غير دقيق أو بعيد عن ممر موثوق؛ تعذر إظهار موقعك أو التوجيه حاليًا.');return;}
       setGpsFix(fix);setGpsMessage('موقعك تقريبي على أقرب ممر موثوق.');
+      if(!gpsCentered.current){gpsCentered.current=true;map.zoomToPoints([{x:fix.point[0],y:fix.point[1]}]);}
     },()=>{setGpsFix(null);setGpsMessage('ما قدرنا نحدد موقعك. تأكد من صلاحية الموقع ودقته.');},{enableHighAccuracy:true,maximumAge:0,timeout:15000});
   }
   function stopGuidance(){setGuidingRide(null);}
-  function stopLocation(){if(gpsWatch.current!==null&&navigator.geolocation)navigator.geolocation.clearWatch(gpsWatch.current);gpsWatch.current=null;setGpsFix(null);setGuidingRide(null);setGpsMessage('تم إيقاف مشاركة الموقع.');}
+  function stopLocation(){if(gpsWatch.current!==null&&navigator.geolocation)navigator.geolocation.clearWatch(gpsWatch.current);gpsWatch.current=null;gpsCentered.current=false;setGpsFix(null);setGuidingRide(null);setGpsMessage('تم إيقاف مشاركة الموقع.');}
   function destinationOptions() {
     return layers.map(l => <optgroup key={l.id} label={l.name}>{mapItems.filter(m => m.kind === layerKinds[l.id]).map(m => <option key={m.id} value={m.id}>{m.name}</option>)}</optgroup>);
   }
