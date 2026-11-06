@@ -12,7 +12,7 @@ export function useModalFocus(open:boolean,onClose:()=>void):RefObject<HTMLEleme
   const previous=document.activeElement instanceof HTMLElement?document.activeElement:null;
   const node=dialog.current;
   if(!node)return;
-  const first=node.querySelector<HTMLElement>('[autofocus]')||node.querySelector<HTMLElement>(focusable)||node;
+  const first=node.querySelector<HTMLElement>('[data-initial-focus]')||node.querySelector<HTMLElement>(focusable)||node;
   // Focus after mounting; tabIndex on the panel allows focus when no controls exist.
   first.focus();
   function onKey(event:KeyboardEvent){
