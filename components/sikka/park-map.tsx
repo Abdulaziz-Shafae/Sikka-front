@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useId, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { MousePointer2 as MousePointer2Icon, MapPin, LocateFixed, Route, Navigation, UtensilsCrossed, Maximize,  ArrowLeft, Toilet, Footprints } from 'lucide-react';
 function PrayerIcon({size=20,...props}:{size?:number;className?:string}){return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}><path d="M3 21V9m-1 0h2M3 6v1m4 14V12c0-3 5-4 5-7 0 3 5 4 5 7v9M6 12h12M10 21v-4a2 2 0 0 1 4 0v4M21 21V9m-1 0h2M21 6v1M2 21h20"/></svg>}
 
@@ -11,6 +11,7 @@ import {clusterMapMarkers} from '@/lib/park-map-geometry';
 import {cuisines} from '@/lib/food-flow';
 import {sikkaApi,type Restaurant} from '@/lib/sikka-api';
 import { toast } from 'sonner';
+import {snapGpsToPath,routeFromGpsToRide,type SnappedLocation} from '@/lib/gps-walking-route';
 
 type Layer = 'rides' | 'places' | 'prayer' | 'restrooms';
 const areaNames: Record<string, string> = { 'city-of-thrills': 'مدينة التشويق', 'steam-town': 'ستيم تاون', 'twilight-gardens': 'حدائق الغسق', 'valley-of-fortune': 'وادي الكنوز', 'discovery-springs': 'ينابيع الاكتشاف', 'grand-exposition': 'المعرض الكبير', citadel: 'القلعة' };
@@ -41,10 +42,14 @@ export function ParkMap({ compact = false, onRide, itinerary=[],focusedKey,onAct
   const [imageLoaded,setImageLoaded]=useState(false);
   const [routing, setRouting] = useState(false), [showPlanner, setShowPlanner] = useState(!compact), [imageError, setImageError] = useState(false);
   const [origin, setOrigin] = useState('iron-rattler'), [destination, setDestination] = useState('gearworks-eatery');
+  const [gpsFix,setGpsFix]=useState<SnappedLocation|null>(null),[gpsMessage,setGpsMessage]=useState(''),[guidingRide,setGuidingRide]=useState<string|null>(null);
+  const gpsWatch=useRef<number|null>(null);
+  useEffect(()=>()=>{if(gpsWatch.current!==null&&typeof navigator!=='undefined'&&navigator.geolocation)navigator.geolocation.clearWatch(gpsWatch.current);},[]);
 
   const selectedItem = mapItems.find(m => m.id === selected)!;
   const selectedRide = rides.find(r => r.slug === selected);
   const route = useMemo(() => routing ? findRoute(origin, destination) : null, [routing, origin, destination]);
+  const gpsRoute=useMemo(()=>gpsFix&&guidingRide?routeFromGpsToRide(gpsFix,guidingRide):null,[gpsFix,guidingRide]);
   const markers = mapPositions.filter(m => m.kind === layerKinds[layer]&&(layer!=='places'||!foodFilters.length||restaurants.some(p=>p.name.toLowerCase()===m.name.toLowerCase()&&p.cuisineTypes.some(c=>foodFilters.includes(c)))));
   const nextKey=itinerary.find(a=>!a.completed)?.key;
   useEffect(()=>{const next=mapPositions.find(m=>m.id===nextKey);if(!next||!map.size.width||!map.size.height)return;setSelected(next.id);const target=layers.find(l=>layerKinds[l.id]===next.kind);if(target)setLayer(target.id);map.zoomToPoints([next]);setExpandedCluster([]);},[nextKey,!!map.size.width,!!map.size.height]);
@@ -72,10 +77,19 @@ export function ParkMap({ compact = false, onRide, itinerary=[],focusedKey,onAct
     if (!found) { toast.info('ما لقينا مسار متصل بين النقطتين في بيانات المشروع'); setRouting(false); return; }
     setRouting(true);map.fit();setExpandedCluster([]);
   }
+  // Testing point 09: refuse imprecise/off-walkway GPS fixes rather than plotting a fictitious position.
   function locate() {
-    if (!navigator.geolocation) { toast.error('جهازك ما يدعم تحديد الموقع'); return; }
-    navigator.geolocation.getCurrentPosition(() => toast.info('تم تحديد موقعك. معايرة الموقع على صورة المنتزه تحتاج ربط الخدمة الفعلية؛ لم نضع موقعًا وهميًا'), () => toast.info('ما قدرنا نحدد موقعك. تقدر تستكشف الخريطة يدويًا'), { timeout: 10000 });
+    if(!navigator.geolocation){setGpsMessage('جهازك ما يدعم تحديد الموقع');return;}
+    if(gpsWatch.current!==null){if(gpsFix)map.zoomToPoints([{x:gpsFix.point[0],y:gpsFix.point[1]}]);return;}
+    setGpsMessage('جاري تحديد موقعك على ممرات المنتزه…');
+    gpsWatch.current=navigator.geolocation.watchPosition(position=>{
+      const fix=snapGpsToPath(position.coords.latitude,position.coords.longitude,position.coords.accuracy);
+      if(!fix){setGpsFix(null);setGpsMessage('الموقع غير دقيق أو بعيد عن ممر موثوق؛ تعذر إظهار موقعك أو التوجيه حاليًا.');return;}
+      setGpsFix(fix);setGpsMessage('موقعك تقريبي على أقرب ممر موثوق.');
+    },()=>{setGpsFix(null);setGpsMessage('ما قدرنا نحدد موقعك. تأكد من صلاحية الموقع ودقته.');},{enableHighAccuracy:true,maximumAge:0,timeout:15000});
   }
+  function stopGuidance(){setGuidingRide(null);}
+  function stopLocation(){if(gpsWatch.current!==null&&navigator.geolocation)navigator.geolocation.clearWatch(gpsWatch.current);gpsWatch.current=null;setGpsFix(null);setGuidingRide(null);setGpsMessage('تم إيقاف مشاركة الموقع.');}
   function destinationOptions() {
     return layers.map(l => <optgroup key={l.id} label={l.name}>{mapItems.filter(m => m.kind === layerKinds[l.id]).map(m => <option key={m.id} value={m.id}>{m.name}</option>)}</optgroup>);
   }
@@ -85,8 +99,11 @@ export function ParkMap({ compact = false, onRide, itinerary=[],focusedKey,onAct
     {layer==='places'&&<div className="food-map-filters"><div className="filter-chips">{Object.entries(cuisines).map(([k,l])=><button key={k} aria-pressed={foodFilters.includes(k)} className={foodFilters.includes(k)?'active':''} onClick={()=>setFoodFilters(a=>a.includes(k)?a.filter(x=>x!==k):[...a,k])}>{l}</button>)}</div>{foodError&&<p role="status">{foodError} تصنيف المطاعم حسب النوع يحتاج بيانات الخدمة</p>}</div>}
     {!!itinerary.length&&<ol className="map-itinerary">{itinerary.map((a,i)=><li key={a.activityKey||a.key} className={a.completed?'done':itinerary.find(x=>!x.completed)?.key===a.key?'next':''}><button onClick={()=>{const m=mapPositions.find(m=>m.id===a.key);if(m){setSelected(m.id);map.zoomToPoints([m]);}onActivity?.(a.activityKey||a.key);}}>{a.completed?'✓':i+1} · {a.title}</button></li>)}</ol>}
     <div className="map-gesture-guide"><MousePointer2Icon/>اسحب للتحريك وقرّب بأصبعين أو بالتتش باد<span>بالكيبورد: + و − للتقريب 0 للتوسيط</span></div>
+    {gpsMessage&&<p className="inline-note" role="status">{gpsMessage}</p>}
+    {guidingRide&&<div className="walking-summary" role="status"><Footprints size={18}/><span>{gpsRoute?`مسار مشي تقريبي من موقعك إلى ${mapItems.find(m=>m.id===guidingRide)?.name}: ${gpsRoute.meters} م، حوالي ${gpsRoute.minutes} د`:"التوجيه متوقف حتى تتوفر قراءة GPS دقيقة على ممر معروف."}</span><Button type="button" variant="outline" onClick={stopGuidance}>إيقاف التوجيه</Button></div>}
     <div className="map-viewport" ref={map.viewportRef} tabIndex={0} role="group" aria-label="خريطة المنتزه التفاعلية. اسحب للتحريك قرّب بأصبعين أو استخدم زائد وناقص من لوحة المفاتيح" {...map.handlers}>
       <div className="map-surface" style={{transform:`translate(${map.view.x}px,${map.view.y}px) scale(${map.view.scale})`,opacity:map.size.width?1:0}}>
+        {gpsRoute&&<svg className="readiness-plan-paths" width="6500" height="4035" aria-label="مسار تقريبي من موقعي إلى اللعبة">{gpsRoute.paths.map((points,i)=><polyline key={i} points={points.map(p=>p.join(",")).join(" ")} fill="none" stroke="#df2030" strokeWidth="24" strokeLinecap="round" strokeLinejoin="round"/>)}</svg>}
         {(useServerRoutes?serverRoutes.length:itineraryRoutes.length)>0&&<svg className="readiness-plan-paths" width="6500" height="4035" aria-hidden="true">{(useServerRoutes?serverRoutes:itineraryRoutes.flatMap(r=>r!.paths)).map((path,i)=><polyline key={i} points={path.filter(p=>p.length===2&&p.every(Number.isFinite)).map(p=>p.join(',')).join(' ')} fill="none" stroke="#69829b" strokeOpacity="0.35" strokeWidth="13" strokeLinecap="round" strokeLinejoin="round"/>)}</svg>}
         {/* Tile only empty soil from the source image; rides and routes stay untouched. */}
         <svg className="map-terrain" width="6500" height="4035" aria-hidden="true">
@@ -106,18 +123,18 @@ export function ParkMap({ compact = false, onRide, itinerary=[],focusedKey,onAct
         {!imageError && <img className="real-park-map" src="/api/media/map" alt="الخريطة المصوّرة للملاهي من مستودع سكة" onError={() => setImageError(true)} onLoad={()=>setImageLoaded(true)} draggable={false}/>}
         <svg preserveAspectRatio="none" viewBox="0 0 6500 4035" className={`map-routes ${!imageLoaded ? 'fallback-routes' : ''}`} aria-label="شبكة مسارات المشي من بيانات المشروع"><rect width="6500" height="4035" fill="transparent"/>{parkGraph.edges.map(e => <path key={e.id} d={'M' + e.points.map(p => p.join(',')).join('L')} fill="none" stroke={!imageLoaded ? '#8ac6e1' : '#0B2E8B'} strokeOpacity={!imageLoaded ? .65 : .22} strokeWidth={!imageLoaded ? 16 : 12} strokeLinecap="round"/>)}{route?.paths.map((p, i) => <path key={i} className="route-highlight" d={'M' + p.map(v => v.join(',')).join('L')} fill="none" stroke="#ed1d2d" strokeWidth="38" strokeLinecap="round"/>)}</svg>
       </div>
-      <div className="map-markers" aria-label="مواقع المنتزه">{showAreas?mapAreas.map(area=><button key={area.id} className="map-area-name" style={{...pointStyle(area),marginTop:area.id==='citadel'?-22:area.id==='city-of-thrills'?10:0}} onClick={()=>{map.zoomToPoints(area.members);setExpandedCluster(area.members.map(m=>m.id));}}>{area.name}</button>):clusters.map(group=>{
+      <div className="map-markers" aria-label="مواقع المنتزه">{gpsFix&&<span className="map-pin" role="img" aria-label="موقعي التقريبي" title="موقعي التقريبي — تحديد موقع على ممر" style={{...pointStyle({x:gpsFix.point[0],y:gpsFix.point[1]}),background:"#1677cf",color:"white",borderRadius:"50%",width:24,height:24,display:"grid",placeItems:"center",zIndex:50,pointerEvents:"none",transform:"translate(-50%,-50%)"}}>●</span>}{showAreas?mapAreas.map(area=><button key={area.id} className="map-area-name" style={{...pointStyle(area),marginTop:area.id==='citadel'?-22:area.id==='city-of-thrills'?10:0}} onClick={()=>{map.zoomToPoints(area.members);setExpandedCluster(area.members.map(m=>m.id));}}>{area.name}</button>):clusters.map(group=>{
         if(group.items.length>1)return <button key={group.items.map(m=>m.id).join('|')} className={`map-cluster ${!itinerary.length&&group.items.some(m=>m.id===selected)?'contains-selected':''}`} style={{left:group.x,top:group.y}} aria-label={`${group.items.length} مواقع متقاربة: ${group.items.map(m=>m.name).join(' ')}`} onClick={()=>{setExpandedCluster(group.items.map(m=>m.id));map.zoomToPoints(group.items);}}><span>{group.items.length}</span><small>مواقع</small></button>;
         const m=group.items[0];const Icon=m.kind==='PRAYER_ROOM'?PrayerIcon:m.kind==='RESTROOM'?Toilet:m.kind==='RESTAURANT'?UtensilsCrossed:MapPin;
-        return <button key={m.id} className={`map-pin ${itinerary.length?(m.id===nextKey?'selected next-station':''):(m.id===selected?'selected':'')} ${m.kind==='PRAYER_ROOM'?'prayer-pin':m.kind==='RESTROOM'?'restroom-pin':m.kind==='RESTAURANT'?'food-pin':''}`} style={{left:group.x,top:group.y}} title={m.name} aria-label={m.name} onClick={()=>{setSelected(m.id);setDestination(m.id);setRouting(false);setExpandedCluster([]);const activity=itinerary.find(a=>a.key===m.id);if(activity)onActivity?.(activity.activityKey||activity.key);}}>{itinerary.some(a=>a.key===m.id&&a.completed)?<span aria-label="مكتملة">✓</span>:<Icon size={14}/>}<span>{m.name}</span></button>;
+        return <button key={m.id} className={`map-pin ${itinerary.length?(m.id===nextKey?'selected next-station':''):(m.id===selected?'selected':'')} ${m.kind==='PRAYER_ROOM'?'prayer-pin':m.kind==='RESTROOM'?'restroom-pin':m.kind==='RESTAURANT'?'food-pin':''}`} style={{left:group.x,top:group.y}} title={m.name} aria-label={m.name} onClick={()=>{setSelected(m.id);setDestination(m.id);setRouting(false);setExpandedCluster([]);const activity=itinerary.find(a=>a.key===m.id);if(activity)onActivity?.(activity.activityKey||activity.key);}}>{itinerary.some(a=>a.key===m.id)?<span aria-label={`أنشطة: ${itinerary.filter(a=>a.key===m.id).map(a=>a.completed?'مكتمل':String(itinerary.indexOf(a)+1)).join('، ')}`}>{itinerary.filter(a=>a.key===m.id).every(a=>a.completed)?'✓':itinerary.filter(a=>a.key===m.id&&!a.completed).map(a=>itinerary.indexOf(a)+1).join('،')}</span>:<Icon size={14}/>}<span>{m.name}</span></button>;
       })}</div>
       {route&&<div className="map-endpoints"><div className="route-endpoint route-start" style={pointStyle(startNode)}><span>بداية المشي</span></div><div className="route-endpoint route-end" style={pointStyle(endNode)}><span>الوجهة</span></div></div>}
-      <div className="map-controls"><button aria-label="توسيط المنتزه وإعادة ضبط الخريطة" onClick={()=>{map.fit();setExpandedCluster([]);}}><Maximize size={18}/></button><button aria-label="تحديد موقعي" onClick={locate}><LocateFixed size={18}/></button></div>
+      <div className="map-controls"><button aria-label="توسيط المنتزه وإعادة ضبط الخريطة" onClick={()=>{map.fit();setExpandedCluster([]);}}><Maximize size={18}/></button><button aria-label="تحديد موقعي" onClick={locate}><LocateFixed size={18}/></button>{gpsWatch.current!==null&&<button aria-label="إيقاف تحديد الموقع" onClick={stopLocation}>إيقاف GPS</button>}</div>
       <div className="map-legend"><i/>مسارات المشروع <span>المداخل تحتاج تأكيدًا ميدانيًا</span></div>
     </div>
     {!!expandedCluster.length&&<div className="map-cluster-options"><div><strong>مواقع قريبة من بعض</strong><button onClick={()=>setExpandedCluster([])}>إغلاق</button></div><p>قرّبنا المنطقة. اختَر الموقع اللي تبيه:</p><div>{expandedCluster.map(id=>{const m=mapItems.find(m=>m.id===id)!;return <button key={id} onClick={()=>{setSelected(id);setDestination(id);setRouting(false);setExpandedCluster([]);}}><MapPin size={13}/>{m.name}</button>;})}</div></div>}
     {selectedItem.kind==='PRAYER_ROOM'&&<div className="prayer-access-note"><PrayerIcon size={16}/><div><strong>مصلى التخصيص غير مؤكد</strong><span>الموقع متاح على الخريطة لكن ما عندنا تأكيد إذا المداخل منفصلة للرجال والنساء</span></div></div>}
     {route && <div className="walking-summary" role="status"><Footprints size={22}/><div><strong>{startItem.name} <ArrowLeft size={13}/> {endItem.name}</strong><span>المسار التقريبي: {route.meters} م {route.minutes} د مشي سرعة افتراضية ٧٠ م/د</span></div><button aria-label="إخفاء مسار المشي" onClick={() => setRouting(false)}>إخفاء</button></div>}
-    <div className="map-selection">{photos[selectedItem.id]?.local&&<img className="map-place-photo" src={photos[selectedItem.id].local} alt={selectedItem.name} loading="lazy"/>}<span className="pin-square"><SelectedIcon size={22}/></span><div><small>{selectedRide?.landName || (selectedItem.kind === 'PRAYER_ROOM' ? 'مكان للصلاة' : selectedItem.kind === 'RESTROOM' ? 'دورات مياه' : 'بريك الأكل')}</small><h3 dir={selectedItem.kind === 'RIDE' || selectedItem.kind === 'RESTAURANT' ? 'ltr' : 'rtl'}>{selectedItem.name}</h3></div><div className="map-selection-actions">{selectedRide && <Button onClick={() => onRide(selected)}>شوف اللعبة<ArrowLeft size={15}/></Button>}</div></div>
+    <div className="map-selection">{photos[selectedItem.id]?.local&&<img className="map-place-photo" src={photos[selectedItem.id].local} alt={selectedItem.name} loading="lazy"/>}<span className="pin-square"><SelectedIcon size={22}/></span><div><small>{selectedRide?.landName || (selectedItem.kind === 'PRAYER_ROOM' ? 'مكان للصلاة' : selectedItem.kind === 'RESTROOM' ? 'دورات مياه' : 'بريك الأكل')}</small><h3 dir={selectedItem.kind === 'RIDE' || selectedItem.kind === 'RESTAURANT' ? 'ltr' : 'rtl'}>{selectedItem.name}</h3></div><div className="map-selection-actions">{selectedRide && <Button onClick={() => onRide(selected)}>شوف اللعبة<ArrowLeft size={15}/></Button>}{selectedRide&&<Button variant="outline" onClick={()=>{setGuidingRide(selected);locate();}}>وجهني لها<Navigation size={15}/></Button>}</div></div>
   </div>;
 }
