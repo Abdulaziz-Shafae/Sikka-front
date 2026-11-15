@@ -16,7 +16,7 @@ async function csrfHeader():Promise<Record<string,string>>{
  const response=await fetch(apiUrl('/api/v1/auth/csrf'),{method:'GET',credentials:'include',cache:'no-store',headers:{Accept:'application/json'}});
  if(!response.ok)throw new SikkaApiError('تعذر تأكيد حماية الجلسة؛ حدّث الصفحة وحاول مرة ثانية.',response.status);
  const value=await response.json();
- if(!value||typeof value.token!=='string'||!value.token.trim())throw new SikkaApiError('تعذر تأكيد حماية الجلسة.',503);
+ if(!value||typeof value!=='object'||!('token' in value)||typeof value.token!=='string'||!value.token.trim())throw new SikkaApiError('تعذر تأكيد حماية الجلسة.',503);
  return {'X-CSRF-TOKEN':value.token};
 }
 export async function apiResponse(path:string,method='GET',body?:unknown){
