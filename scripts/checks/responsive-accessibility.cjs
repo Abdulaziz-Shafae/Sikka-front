@@ -21,7 +21,7 @@ for(const id of ['skipDialogRef','replanDialogRef','completionDialogRef']){
  assert.match(plan,new RegExp('ref=\\{'+id+'\\} tabIndex=\\{-1\\}'));
 }
 assert.match(plan,/useModalFocus\(!!skipConfirmation/);
-assert.match(plan,/useModalFocus\(replanOpen/);
+assert.match(plan,/useModalFocus<HTMLFormElement>\(replanOpen/);
 assert.match(plan,/useModalFocus\(!!completion/);
 assert.match(preview,/className="sikka-poster-preview"/);
 assert.match(preview,/tabIndex=\{0\}/);
