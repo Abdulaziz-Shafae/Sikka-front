@@ -3,8 +3,8 @@ import {useEffect,useRef,type RefObject} from 'react';
 
 // Ensures each Sikka dialog is keyboard-accessible without changing its appearance.
 const focusable='a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
-export function useModalFocus(open:boolean,onClose:()=>void):RefObject<HTMLElement|null>{
- const dialog=useRef<HTMLElement|null>(null);
+export function useModalFocus<T extends HTMLElement=HTMLElement>(open:boolean,onClose:()=>void):RefObject<T|null>{
+ const dialog=useRef<T|null>(null);
  const close=useRef(onClose);
  close.current=onClose;
  useEffect(()=>{
