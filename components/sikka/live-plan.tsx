@@ -30,7 +30,7 @@ export function LivePlan({activeView=false,onRegenerate,details,visit,members,me
  const [replanOpen,setReplanOpen]=useState(false);
  const [replanReason,setReplanReason]=useState('');
  const skipDialogRef=useModalFocus(!!skipConfirmation,()=>{if(!busy)setSkipConfirmation(null);});
- const replanDialogRef=useModalFocus(replanOpen,()=>{if(!busy)setReplanOpen(false);});
+ const replanDialogRef=useModalFocus<HTMLFormElement>(replanOpen,()=>{if(!busy)setReplanOpen(false);});
  const completionDialogRef=useModalFocus(!!completion,()=>{if(!busy)setCompletion(null);});
  const [dismissedRatings,setDismissedRatings]=useState<number[]>([]);
  const ratingKey=`sikka-activity-ratings:${accountId}:${visit.id}:${viewerId}`;
